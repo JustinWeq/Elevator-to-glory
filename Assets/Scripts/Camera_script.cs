@@ -15,7 +15,7 @@ public class Camera_script : MonoBehaviour
     {
         //move to the starting height and player location
         GameObject grug = GameObject.Find("Grug");
-        transform.position = new Vector3(grug.transform.position.x, CAMERA_START_HEIGHT, grug.transform.position.z);
+        transform.position = new Vector3(0, CAMERA_START_HEIGHT, 0);
     }
 
     // Update is called once per frame

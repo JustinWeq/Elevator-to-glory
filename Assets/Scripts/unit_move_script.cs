@@ -11,6 +11,7 @@ public class unit_move_script : MonoBehaviour
     {
         //locate the navMeshAgent
         navmeshAgent = GetComponent<NavMeshAgent>();
+       // MoveTo(new Vector3(50, 0, 0));
     }
 
     // Update is called once per frame
@@ -19,7 +20,7 @@ public class unit_move_script : MonoBehaviour
         
     }
 
-    void MoveTo(Vector3 position)
+    public void MoveTo(Vector3 position)
     {
         navmeshAgent.destination = position;
     }
