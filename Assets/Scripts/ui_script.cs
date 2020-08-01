@@ -10,6 +10,11 @@ public class ui_script : MonoBehaviour
         
     }
 
+    public void SetActiveUnit(GameObject unit)
+    {
+
+    }
+
     // Update is called once per frame
     void Update()
     {

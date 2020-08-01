@@ -2,23 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Ability_Script : MonoBehaviour
+public enum TargetType
 {
-    public enum TargetType
-    {
-        NoTarget,
-        Aura,
-        PointTarget,
-        AreaTarget,
-        VectorTarget
-    }
-    public enum AbilityActivationType
-    {
-        AutoCast,
-        Toggle,
-        Channeld
-    }
-    GameObject parent_unit;
+    NoTarget,
+    Aura,
+    PointTarget,
+    AreaTarget,
+    VectorTarget
+}
+public enum AbilityActivationType
+{
+    Cast,
+    AutoCast,
+    Toggle,
+    Channeld
+}
+
+public abstract class Ability : MonoBehaviour
+{
+
     public float BaseCooldown;
     public float BaseManaCost;
     public float BaseCastTime;
@@ -28,15 +30,37 @@ public abstract class Ability_Script : MonoBehaviour
     public bool ImmunityPiercing;
     public bool NonPurgeable;
     public bool NonDispellable;
-    private float remaining_cooldown;
-    private float cooldown;
-    private float cast_time;
-    private float cast_range;
+    public Texture Thumbnail;
+    protected float remaining_cooldown;
+    protected float cooldown;
+    protected float cast_time;
+    protected float cast_range;
+    protected int level;
+    protected GameObject parent_unit;
+    public int MaxLevel;
+
+
+    public abstract void ActivateAbility(GameObject target = null);
+
+    protected abstract void LevelUp();
+
+     public bool Level()
+     {
+        if (level < MaxLevel)
+        {
+            level++;
+            LevelUp();
+            return true;
+        }
+        return false;
+     }
+
     // Start is called before the first frame update
-    void Start()
+    protected void Start()
     {
-        
+        level = 0;
     }
+
 
     public void SetParentUnit(GameObject parent_unit)
     {
@@ -44,24 +68,14 @@ public abstract class Ability_Script : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    protected void Update()
     {
-        if(remaining_cooldown > 0)
+        if (remaining_cooldown > 0)
         {
-            remaining_cooldown -= 1.0f*Time.deltaTime;
+            remaining_cooldown -= 1.0f * Time.deltaTime;
         }
     }
 
-    public bool Fire()
-    {
-        if( remaining_cooldown <= 0.001f)
-        {
-            ActivateAbility();
-            remaining_cooldown = cooldown;
-            return true;
-        }
-        return false;
-    }
 
     public void ScaleCooldown(float scale)
     {
@@ -103,6 +117,5 @@ public abstract class Ability_Script : MonoBehaviour
         return cast_range;
     }
 
-    
-    protected abstract void ActivateAbility();
+
 }

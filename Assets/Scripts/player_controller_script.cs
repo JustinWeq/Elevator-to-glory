@@ -9,16 +9,26 @@ public class player_controller_script : MonoBehaviour
     public GameObject DebugSphere;
     List<GameObject> controlled_units;
     private GameObject main_unit;
+    private ui_script ui;
+    private Camera_script camera;
     // Start is called before the first frame update
     void Start()
     {
+        //Get the ui script
+        ui = GetComponent<ui_script>();
+        //get the camera script
+        camera = GetComponent<Camera_script>();
         controlled_units = new List<GameObject>();
         //add all of the manually added units to the controlled units group
         foreach(GameObject unit in ManuallyAddedUnits)
         {
             controlled_units.Add(unit);
             main_unit = unit;
+            //set the unit control script unit
+            
         }
+        ui.SetActiveUnit(main_unit);
+        camera.SetActiveUnit(main_unit);
     }
 
     // Update is called once per frame
@@ -30,11 +40,14 @@ public class player_controller_script : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(GameObject.FindObjectOfType<Camera>().ScreenPointToRay(Input.mousePosition), out hit))
             {
-                foreach(GameObject unit in controlled_units)
+                if (hit.transform.tag == "Traversable")
                 {
-                    unit.GetComponent<unit_move_script>().MoveTo(hit.point);
+                    foreach (GameObject unit in controlled_units)
+                    {
+                        unit.GetComponent<unit_move_script>().MoveTo(hit.point);
+                    }
+                    Instantiate(DebugSphere, hit.point, Quaternion.identity);
                 }
-                Instantiate(DebugSphere, hit.point, Quaternion.identity);
             }
 
         }
