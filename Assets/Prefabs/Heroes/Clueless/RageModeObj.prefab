@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4725587529784974139
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5173729248828115782}
+  - component: {fileID: 8990348837553811074}
+  m_Layer: 0
+  m_Name: RageModeObj
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5173729248828115782
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4725587529784974139}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8990348837553811074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4725587529784974139}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eccdf60734375c549ab242a015bcc022, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BaseCooldown:
+  - 0
+  - 0
+  - 0
+  BaseManaCost:
+  - 0
+  - 0
+  - 0
+  BaseCastTime: 0
+  BaseCastRange: []
+  can_be_leveled: 2
+  _TargetType: 5
+  ActivationType: 0
+  ImmunityPiercing: 0
+  NonPurgeable: 0
+  NonDispellable: 0
+  Thumbnail: {fileID: 2800000, guid: cbd1c1684640ad7458e5c6f5d68ac7f3, type: 3}
+  MaxLevel: 4

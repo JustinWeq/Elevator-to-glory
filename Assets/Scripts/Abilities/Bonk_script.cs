@@ -12,7 +12,7 @@ public class Bonk_script :   Ability
     private float stun_duration;
 
 
-    public override void ActivateAbility(GameObject target)
+    public override bool ActivateAbility(GameObject target)
     {
         if (remaining_cooldown <= 0.001f)
         {
@@ -22,6 +22,17 @@ public class Bonk_script :   Ability
             remaining_cooldown = cooldown;
 
         }
+        return true;
+    }
+
+    protected override string GetDescription()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override string GetName()
+    {
+        throw new System.NotImplementedException();
     }
 
     protected override void LevelUp()

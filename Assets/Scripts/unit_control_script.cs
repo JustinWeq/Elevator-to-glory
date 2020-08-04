@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Assets.Scripts;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -33,6 +34,7 @@ public class unit_control_script : MonoBehaviour
     public PrimaryAttributeType PrimaryAttribute;
     public AttackType AttackStyle;
     public bool CustomUi = false;
+    public GameObject[] Abilities = new GameObject[6];
     protected Ability[] abilitys = new Ability[6];
     protected float hp;
     protected float max_mana;
@@ -53,6 +55,9 @@ public class unit_control_script : MonoBehaviour
     protected const float HP_REGEN_SCALER = 0.02f;
     protected int level;
     protected int ability_points;
+    private List<OnHit> on_hit_list;
+    private List<OnDamaged> on_damaged_list;
+
 
 
 
@@ -60,8 +65,8 @@ public class unit_control_script : MonoBehaviour
     void Start()
     {
         //set level and give one ability point
-        level = 1;
-        ability_points = 1;
+        level = 0;
+        ability_points = 0;
         //set stats
 
         //calculate starting hp
@@ -71,6 +76,37 @@ public class unit_control_script : MonoBehaviour
         //set max mana and hp
         max_hp = hp;
         max_mana = mana;
+
+        //set starting stats
+        intelligence = BaseIntelligence;
+        agility = BaseAgility;
+        strength = BaseStrength;
+
+        //read in the abilitys
+        for(int i = 0;i < 6;i++)
+        {
+            if(Abilities[i] != null)
+            {
+                abilitys[i] = Abilities[i].GetComponent<Ability>();
+            }
+        }
+
+    }
+
+    public void LevelUp()
+    {
+        level++;
+        ability_points++;
+
+        hp += HP_SCALER *BaseStrengthGain;
+        max_hp += HP_SCALER * BaseStrengthGain;
+
+        mana += MANA_SCALER * BaseIntelligenceGain;
+        max_mana += MANA_SCALER * BaseIntelligenceGain;
+
+        intelligence += BaseIntelligenceGain;
+        strength += BaseStrengthGain;
+        agility += BaseAgilityGain;
     }
 
     public bool LevelAbility(int index)
@@ -86,12 +122,17 @@ public class unit_control_script : MonoBehaviour
         return false;
     }
 
+    public Ability GetAbility(int index)
+    {
+        return abilitys[index];
+    }
+
     public float GetMaxMana()
     {
         return max_mana;
     }
 
-    public float GetCurrentMana()
+    public float GetMana()
     {
         return mana;
     }
@@ -123,6 +164,11 @@ public class unit_control_script : MonoBehaviour
             hp = 0;
         else if(hp > max_hp)
             hp = max_hp;
+    }
+
+    public int GetLevel()
+    {
+        return level;
     }
 
 
@@ -171,5 +217,25 @@ public class unit_control_script : MonoBehaviour
 
     }
 
-    
+    public void RegisterOnHit(OnHit effect)
+    {
+        on_hit_list.Add(effect);
+    }
+
+    public void DeregisterOnHit(OnHit effect)
+    {
+        on_hit_list.Remove(effect);
+    }
+
+    public void RegisterOnDamaged(OnDamaged effect)
+    {
+        on_damaged_list.Add(effect);
+    }
+
+    public void DeregisterOnDamaged(OnDamaged effect)
+    {
+        on_damaged_list.Remove(effect);
+    }
+
+
 }
