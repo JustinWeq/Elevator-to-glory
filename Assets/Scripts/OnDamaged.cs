@@ -8,6 +8,6 @@ namespace Assets.Scripts
 {
     public interface OnDamaged
     {
-        public float OnDamaged(float damage);
+         float OnDamaged(float damage);
     }
 }

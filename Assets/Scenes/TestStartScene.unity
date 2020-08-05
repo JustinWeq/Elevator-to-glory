@@ -1279,9 +1279,11 @@ MonoBehaviour:
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: 'Stats:'
+  m_Text: 'Stats:
+
+'
 --- !u!222 &491507780
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3329,7 +3331,7 @@ MonoBehaviour:
   mana_bar: {fileID: 926342805}
   health_text: {fileID: 1543410726}
   mana_text: {fileID: 799495802}
-  stat_text: {fileID: 0}
+  stat_text: {fileID: 491507779}
   ability1_image: {fileID: 1504495896}
   ability2_image: {fileID: 160540414}
   ability3_image: {fileID: 1569208879}

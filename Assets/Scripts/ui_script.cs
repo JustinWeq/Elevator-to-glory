@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -52,7 +53,15 @@ public class ui_script : MonoBehaviour
         //hp_bar.rectTransform.sizeDelta = new Vector2(health_bar_length * active_unit.GetHp() / active_unit.GetMaxHp(), hp_bar.rectTransform.sizeDelta.y);
         //update the mana bar
         mana_text.text = active_unit.GetMana() + "/" + active_unit.GetMaxMana();
-       // mana_bar.rectTransform.sizeDelta = new Vector2(mana_bar_length * active_unit.GetMana() / active_unit.GetMaxMana(), mana_bar.rectTransform.sizeDelta.y);
+        // mana_bar.rectTransform.sizeDelta = new Vector2(mana_bar_length * active_unit.GetMana() / active_unit.GetMaxMana(), mana_bar.rectTransform.sizeDelta.y);
+
+        //get pther stats
+        StringBuilder str = new StringBuilder();
+        str.Append("Strength: " + active_unit.GetStrength() + "\n");
+        str.Append("Agility: " + active_unit.GetAgility() + "\n");
+        str.Append("Intelligence: " + active_unit.GetIntelligence() + "\n");
+        stat_text.text = str.ToString();
+
     }
 
     // Update is called once per frame

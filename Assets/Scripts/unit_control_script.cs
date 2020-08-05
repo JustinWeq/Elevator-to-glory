@@ -48,11 +48,17 @@ public class unit_control_script : MonoBehaviour
     protected float agility;
     protected float hp_regen;
     protected float mana_regen;
+    protected float spell_amp;
     protected float damage;
+    protected float magic_resistance;
     protected const float MANA_SCALER = 14;
     protected const float MANA_REGEN_SCALER = 0.015f;
     protected const float HP_SCALER = 14;
     protected const float HP_REGEN_SCALER = 0.02f;
+    protected const float ARMOR_SCALER = 0.2f;
+    protected const float SPELL_AMP_SCALER = 0.05f;
+    protected const float MovespeedScaler = 0.5f;
+    protected const float BASE_MAGIC_RESIST = 25;
     protected int level;
     protected int ability_points;
     private List<OnHit> on_hit_list;
@@ -70,17 +76,52 @@ public class unit_control_script : MonoBehaviour
         //set stats
 
         //calculate starting hp
-        hp = BaseHp + HP_SCALER * BaseStrength;
-        mana = BaseMana + MANA_SCALER * BaseIntelligence;
+        hp = BaseHp;// + HP_SCALER * BaseStrength;
+        mana = BaseMana;// + MANA_SCALER * BaseIntelligence;
 
         //set max mana and hp
         max_hp = hp;
         max_mana = mana;
 
+        //set starting regen
+        hp_regen = BaseHpRegen;// + strength * HP_REGEN_SCALER;
+        mana_regen = BaseManaRegen;// + intelligence*MANA_REGEN_SCALER;
+
         //set starting stats
         intelligence = BaseIntelligence;
         agility = BaseAgility;
         strength = BaseStrength;
+
+        //set starting armor
+        armor = BaseArmor;// + agility * ARMOR_SCALER;
+        //set starting attack speed
+        attack_speed = agility;
+        //set starting damage
+        damage = BaseDamage;
+        switch(PrimaryAttribute)
+        {
+            case PrimaryAttributeType.Agility:
+            {
+                damage += agility;
+                break;
+            }
+            case PrimaryAttributeType.Strength:
+            {
+                    damage += strength;
+               break;
+            }
+            case PrimaryAttributeType.Intelligence:
+            {
+                    damage += intelligence;
+               break;
+            }
+        }
+
+        //set spell amp
+        spell_amp = intelligence * SPELL_AMP_SCALER;
+
+        //set base spell resist
+        magic_resistance = BASE_MAGIC_RESIST;
 
         //read in the abilitys
         for(int i = 0;i < 6;i++)
@@ -90,23 +131,67 @@ public class unit_control_script : MonoBehaviour
                 abilitys[i] = Abilities[i].GetComponent<Ability>();
             }
         }
-
+        LevelUp();
+        LevelUp();
+        LevelUp();
+        LevelUp();
+        LevelUp();
+        LevelUp();
     }
 
     public void LevelUp()
     {
+        //level up
         level++;
         ability_points++;
 
+        //update hp
         hp += HP_SCALER *BaseStrengthGain;
         max_hp += HP_SCALER * BaseStrengthGain;
+        hp_regen += HP_REGEN_SCALER * BaseStrengthGain;
 
+
+        //update mana
         mana += MANA_SCALER * BaseIntelligenceGain;
         max_mana += MANA_SCALER * BaseIntelligenceGain;
+        mana_regen += MANA_REGEN_SCALER * BaseIntelligenceGain;
 
+        //update stats
         intelligence += BaseIntelligenceGain;
         strength += BaseStrengthGain;
         agility += BaseAgilityGain;
+
+        //update damage
+        switch (PrimaryAttribute)
+        {
+            case PrimaryAttributeType.Agility:
+                {
+                    damage += BaseAgilityGain;
+                    break;
+                }
+            case PrimaryAttributeType.Strength:
+                {
+                    damage += BaseStrengthGain;
+                    break;
+                }
+            case PrimaryAttributeType.Intelligence:
+                {
+                    damage += BaseIntelligenceGain;
+                    break;
+                }
+        }
+
+        //update attack speed
+        attack_speed += BaseAgilityGain;
+
+        //update armor
+        armor += BaseAgilityGain * ARMOR_SCALER;
+
+        //update movespeed
+        movespeed += BaseAgilityGain * MovespeedScaler;
+
+        //update spell amp
+        spell_amp += BaseIntelligenceGain * SPELL_AMP_SCALER;
     }
 
     public bool LevelAbility(int index)
@@ -169,6 +254,31 @@ public class unit_control_script : MonoBehaviour
     public int GetLevel()
     {
         return level;
+    }
+
+    public int GetStrength()
+    {
+        return (int)strength;
+    }
+
+    public int GetAgility()
+    {
+        return (int)strength;
+    }
+
+    public int GetIntelligence()
+    {
+        return (int)intelligence;
+    }
+
+    public float GetHpRegen()
+    {
+        return hp_regen;
+    }
+
+    public float GetManaRegen()
+    {
+        return mana_regen;
     }
 
 
