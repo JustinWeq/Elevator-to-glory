@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class unit_control_script : MonoBehaviour
@@ -37,20 +38,50 @@ public class unit_control_script : MonoBehaviour
     public GameObject[] Abilities = new GameObject[6];
     protected Ability[] abilitys = new Ability[6];
     protected float hp;
+    protected float added_hp;
     protected float max_mana;
+    protected float added_max_mana;
     protected float max_hp;
+    protected float added_max_hp;
     protected float mana;
+    protected float added_mana;
     protected float movespeed;
+    protected float added_movespeed;
     protected float armor;
+    protected float added_armor;
     protected float attack_speed;
+    protected float added_attack_speed;
     protected float intelligence;
     protected float strength;
     protected float agility;
     protected float hp_regen;
+    protected float added_hp_regen;
     protected float mana_regen;
+    protected float added_mana_regen;
     protected float spell_amp;
+    protected float added_spell_amp;
     protected float damage;
+    protected float added_damage;
     protected float magic_resistance;
+    protected float added_magic_resistance;
+    protected float castspeed_reduction;
+    protected float cooldown_reduction;
+    protected float cast_range;
+    protected float spell_lifesteal;
+    protected float lifesteal;
+    protected float attack_range;
+    protected float pure_damage;
+    protected float splash;
+    protected float cleave;
+    protected float critical_damage;
+    protected float critical_chance;
+    protected float status_resist;
+    protected bool can_move;
+    protected bool can_attack;
+    protected bool can_cast_abilities;
+    protected bool can_use_passives;
+    protected bool can_use_item_abilities;
+    protected int experience;
     protected const float MANA_SCALER = 14;
     protected const float MANA_REGEN_SCALER = 0.015f;
     protected const float HP_SCALER = 14;
@@ -63,6 +94,7 @@ public class unit_control_script : MonoBehaviour
     protected int ability_points;
     private List<OnHit> on_hit_list;
     private List<OnDamaged> on_damaged_list;
+    private List<OnAbilityHit> on_ability_hit_list;
 
 
 
@@ -123,6 +155,9 @@ public class unit_control_script : MonoBehaviour
         //set base spell resist
         magic_resistance = BASE_MAGIC_RESIST;
 
+        //set base movespeed
+        movespeed = BaseMoveSpeed + MovespeedScaler*agility;
+
         //read in the abilitys
         for(int i = 0;i < 6;i++)
         {
@@ -131,12 +166,43 @@ public class unit_control_script : MonoBehaviour
                 abilitys[i] = Abilities[i].GetComponent<Ability>();
             }
         }
+
         LevelUp();
-        LevelUp();
-        LevelUp();
-        LevelUp();
-        LevelUp();
-        LevelUp();
+        //set experience
+        experience = 0;
+        //set added stats
+        added_attack_speed = 0;
+        added_armor = 0;
+        added_damage = 0;
+        added_hp = 0;
+        added_hp_regen = 0;
+        added_magic_resistance = 0;
+        added_mana = 0;
+        added_mana_regen = 0;
+        added_max_hp = 0;
+        added_max_mana = 0;
+        added_movespeed = 0;
+        added_spell_amp = 0;
+
+        //set extra stats
+        castspeed_reduction = 0.0f;
+        cooldown_reduction = 0.0f;
+        cast_range = 0;
+        spell_lifesteal = 0;
+        lifesteal = 0;
+        attack_range = 0;
+        pure_damage = 0;
+        splash = 0;
+        cleave = 0;
+        added_magic_resistance = 0;
+        status_resist = 0;
+        critical_damage = 0;
+        critical_chance = 0;
+
+        //init lists
+        on_ability_hit_list = new List<OnAbilityHit>();
+        on_damaged_list = new List<OnDamaged>();
+        on_hit_list = new List<OnHit>();
     }
 
     public void LevelUp()
@@ -256,6 +322,16 @@ public class unit_control_script : MonoBehaviour
         return level;
     }
 
+    public float GetDamage()
+    {
+        return damage;
+    }
+
+    public float GetAddedDamage()
+    {
+        return added_damage;
+    }
+
     public int GetStrength()
     {
         return (int)strength;
@@ -276,10 +352,136 @@ public class unit_control_script : MonoBehaviour
         return hp_regen;
     }
 
+    public float GetAddedHpRegen()
+    {
+        return added_hp_regen;
+    }
+
     public float GetManaRegen()
     {
         return mana_regen;
     }
+
+    public float GetAddedManaRegen()
+    {
+        return added_mana_regen;
+    }
+
+    public int GetAttackSpeed()
+    {
+        return (int)attack_speed;
+    }
+
+    public int GetAddedAttackSpeed()
+    {
+        return (int)added_attack_speed;
+    }
+
+    public float GetArmor()
+    {
+        return armor;
+    }
+
+    public float GetAddedArmor()
+    {
+        return added_armor;
+    }
+
+    public float GetMovespeed()
+    {
+        return movespeed;
+    }
+
+    public float GetAddedMovespeed()
+    {
+        return added_movespeed;
+    }
+
+    public float GetSpellamp()
+    {
+        return spell_amp;
+    }
+
+    public float GetAddedSpellAmp()
+    {
+        return added_spell_amp;
+    }
+
+    public float GetCastSpeedReduction()
+    {
+        return castspeed_reduction;
+    }
+
+    public float GetCooldownReduction()
+    {
+        return cooldown_reduction;
+    }
+
+    public float GetCastRange()
+    {
+        return cast_range;
+    }
+
+    public float GetBaseAttackRange()
+    {
+        return BaseAttackRange;
+    }
+
+    public float GetAddedAttackRange()
+    {
+        return attack_range;
+    }
+
+    public float GetSpellLifesteal()
+    {
+        return spell_lifesteal;
+    }
+
+    public float GetLifesteal()
+    {
+        return lifesteal;
+    }
+
+    public float GetPureDamage()
+    {
+        return pure_damage;
+    }
+
+    public float GetSplash()
+    {
+        return splash;
+    }
+
+    public float GetCleave()
+    {
+        return cleave;
+    }
+
+    public float GetMagicResist()
+    {
+        return magic_resistance;
+    }
+
+    public float GetAddedMagicResistance()
+    {
+        return added_magic_resistance;
+    }
+
+    public float GetStatusResist()
+    {
+        return status_resist;
+    }
+
+    public float GetCriticalDamage()
+    {
+        return critical_damage;
+    }
+
+    public float GetCriticalChance()
+    {
+        return critical_chance;
+    }
+
 
 
 

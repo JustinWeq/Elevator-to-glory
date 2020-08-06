@@ -11,6 +11,7 @@ public class player_controller_script : MonoBehaviour
     private GameObject main_unit;
     private ui_script ui;
     private Camera_script camera;
+    private int gold;
     // Start is called before the first frame update
     void Start()
     {

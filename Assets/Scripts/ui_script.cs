@@ -49,10 +49,10 @@ public class ui_script : MonoBehaviour
         ability3_image.texture = active_unit.GetAbility(2).GetIcon();
         ability4_image.texture = active_unit.GetAbility(3).GetIcon();
         //update the health bar
-        health_text.text = active_unit.GetHp()+"/"+active_unit.GetMaxHp();
+        health_text.text = active_unit.GetHp()+"/"+active_unit.GetMaxHp() + " + " + (active_unit.GetHpRegen() + active_unit.GetAddedHpRegen());
         //hp_bar.rectTransform.sizeDelta = new Vector2(health_bar_length * active_unit.GetHp() / active_unit.GetMaxHp(), hp_bar.rectTransform.sizeDelta.y);
         //update the mana bar
-        mana_text.text = active_unit.GetMana() + "/" + active_unit.GetMaxMana();
+        mana_text.text = active_unit.GetMana() + "/" + active_unit.GetMaxMana() + " + " + (active_unit.GetManaRegen() + active_unit.GetAddedManaRegen());
         // mana_bar.rectTransform.sizeDelta = new Vector2(mana_bar_length * active_unit.GetMana() / active_unit.GetMaxMana(), mana_bar.rectTransform.sizeDelta.y);
 
         //get pther stats
@@ -60,6 +60,10 @@ public class ui_script : MonoBehaviour
         str.Append("Strength: " + active_unit.GetStrength() + "\n");
         str.Append("Agility: " + active_unit.GetAgility() + "\n");
         str.Append("Intelligence: " + active_unit.GetIntelligence() + "\n");
+        str.Append("Attack damage: " + active_unit.GetDamage() + " + " + active_unit.GetAddedDamage() + "\n");
+        str.Append("Attack speed: " + active_unit.GetAttackSpeed() + " + " + active_unit.GetAddedAttackSpeed() + "\n");
+        str.Append("Move speed: " + active_unit.GetMovespeed() + " + " + active_unit.GetAddedMovespeed() + "\n");
+        str.Append("Ability amp: " + active_unit.GetSpellamp() + " + " + active_unit.GetAddedSpellAmp() + "\n");
         stat_text.text = str.ToString();
 
     }
