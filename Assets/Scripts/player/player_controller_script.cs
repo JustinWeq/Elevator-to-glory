@@ -67,4 +67,14 @@ public class player_controller_script : MonoBehaviour
     {
         controlled_units.Remove(unit);
     }
+
+    public int GetGold()
+    {
+        return gold;
+    }
+
+    public void AddGold(int amount)
+    {
+        gold += amount;
+    }
 }

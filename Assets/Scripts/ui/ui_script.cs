@@ -18,17 +18,20 @@ public class ui_script : MonoBehaviour
     public RawImage ability2_image;
     public RawImage ability3_image;
     public RawImage ability4_image;
+    public RawImage ui_back;
     private float mana_bar_length;
     private float health_bar_length;
 
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         //get the ui elements
 
         mana_bar_length = mana_bar.rectTransform.sizeDelta.x;
         health_bar_length = hp_bar.rectTransform.sizeDelta.x;
+        // move the ui down to the bottom of the screen
+        ui_back.rectTransform.anchoredPosition = new Vector2(Screen.width/2,ui_back.rectTransform.anchoredPosition.y);
     }
 
     public void SetActiveUnit(GameObject unit)
@@ -50,10 +53,10 @@ public class ui_script : MonoBehaviour
         ability4_image.texture = active_unit.GetAbility(3).GetIcon();
         //update the health bar
         health_text.text = active_unit.GetHp()+"/"+active_unit.GetMaxHp() + " + " + (active_unit.GetHpRegen() + active_unit.GetAddedHpRegen());
-        //hp_bar.rectTransform.sizeDelta = new Vector2(health_bar_length * active_unit.GetHp() / active_unit.GetMaxHp(), hp_bar.rectTransform.sizeDelta.y);
+        hp_bar.rectTransform.sizeDelta = new Vector2(health_bar_length*active_unit.GetHp()/active_unit.GetMaxHp(), hp_bar.rectTransform.sizeDelta.y);
         //update the mana bar
         mana_text.text = active_unit.GetMana() + "/" + active_unit.GetMaxMana() + " + " + (active_unit.GetManaRegen() + active_unit.GetAddedManaRegen());
-        // mana_bar.rectTransform.sizeDelta = new Vector2(mana_bar_length * active_unit.GetMana() / active_unit.GetMaxMana(), mana_bar.rectTransform.sizeDelta.y);
+        mana_bar.rectTransform.sizeDelta = new Vector2(mana_bar_length * active_unit.GetMana() / active_unit.GetMaxMana(), mana_bar.rectTransform.sizeDelta.y);
 
         //get pther stats
         StringBuilder str = new StringBuilder();
