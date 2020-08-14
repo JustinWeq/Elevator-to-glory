@@ -92,16 +92,20 @@ public class unit_control_script : MonoBehaviour
     protected const float BASE_MAGIC_RESIST = 25;
     protected int level;
     protected int ability_points;
+    protected GameObject attack_target = null;
+    protected unit_move_script move_Script = null;
     private List<OnHit> on_hit_list;
     private List<OnDamaged> on_damaged_list;
     private List<OnAbilityHit> on_ability_hit_list;
-
+    private float windup;
 
 
 
     // Start is called before the first frame update
     void Start()
     {
+        //get the unit move script
+        move_Script = GetComponent<unit_move_script>();
         //set level and give one ability point
         level = 0;
         ability_points = 0;
@@ -196,7 +200,7 @@ public class unit_control_script : MonoBehaviour
         cleave = 0;
         added_magic_resistance = 0;
         status_resist = 0;
-        critical_damage = 0;
+        critical_damage = 1;
         critical_chance = 0;
 
         //init lists
@@ -322,11 +326,15 @@ public class unit_control_script : MonoBehaviour
         return level;
     }
 
-    public float GetDamage()
+    public float GetBaseDamage()
     {
         return damage;
     }
 
+    public float GetDamage()
+    {
+        return BaseDamage + added_damage;
+    }
     public float GetAddedDamage()
     {
         return added_damage;
@@ -432,6 +440,11 @@ public class unit_control_script : MonoBehaviour
         return attack_range;
     }
 
+    public float GetAttackRange()
+    {
+        return BaseAttackRange + attack_range;
+    }
+
     public float GetSpellLifesteal()
     {
         return spell_lifesteal;
@@ -485,6 +498,8 @@ public class unit_control_script : MonoBehaviour
 
 
 
+
+
     // Update is called once per frame
     void Update()
     {
@@ -526,8 +541,52 @@ public class unit_control_script : MonoBehaviour
         }
 
 
+        //check to see if we can attack the enemy
+        if(attack_target != null && Vector3.Distance(attack_target.transform.position,transform.position) < GetAttackRange()/100.0f)
+        {
+            windup -= Time.deltaTime; 
+        }
+        else
+        {
+            //reset windup
+            ResetWindup();
+        }
+
+        if(windup <= 0)
+        {
+            //attack the enemy target
+            AttackEnemy();
+        }
+    }
+
+    private void ResetWindup()
+    {
+        windup = GetAttackTime();
+    }
+
+    public float GetAttackTime()
+    {
+        return BaseAttackTime / (1.0f + attack_speed/100.0f);
+    }
+
+    private void AttackEnemy()
+    {
+        //set wind up back to start
+        ResetWindup();
+        //calculate damage
+        float total_damage = GetDamage();
+        //calculate crit
+        int crit_multiply = 0;
+        crit_multiply +=(int) (critical_chance / 100);
+        crit_multiply += Random.Range(1, 100) < (int)(critical_chance) % 100?1:0;
+        //add crit damage
+        total_damage += total_damage * crit_multiply * critical_damage;
+        total_damage += pure_damage;
+        //damage the enemy target
+        attack_target.GetComponent<enemy_controller>().DamageEnemy(total_damage);
 
     }
+
 
     public void RegisterOnHit(OnHit effect)
     {
@@ -549,5 +608,13 @@ public class unit_control_script : MonoBehaviour
         on_damaged_list.Remove(effect);
     }
 
+    public void SetAttackOrder(GameObject enemy)
+    {
+        attack_target = enemy;
+        //move to the enemy minus the attack range and a percentage
+        move_Script.MoveTo(enemy.transform.position,GetAttackRange()/100.0f-(GetAttackRange()/100.0f)*0.10f);
+        //rotate towards the target
+        transform.LookAt(new Vector3(enemy.transform.position.x,enemy.transform.position.y,enemy.transform.position.z), -Vector3.up);
+    }
 
 }

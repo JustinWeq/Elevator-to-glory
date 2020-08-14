@@ -41,7 +41,9 @@ public abstract class Ability : MonoBehaviour
     protected float mana_cost;
     protected int level;
     protected GameObject parent_unit;
+    private bool on_enemy;
     public int MaxLevel;
+
 
 
     public abstract bool ActivateAbility(GameObject target = null);
@@ -54,6 +56,8 @@ public abstract class Ability : MonoBehaviour
 
      public bool Level()
      {
+        if (on_enemy)
+            return false;
         if (level < MaxLevel && parent_unit.GetComponent<unit_control_script>().GetLevel() > level*can_be_leveled)
         {
             level++;
@@ -73,12 +77,23 @@ public abstract class Ability : MonoBehaviour
     protected void Start()
     {
         level = 0;
+
+        on_enemy = false;
     }
 
 
     public void SetParentUnit(GameObject parent_unit)
     {
         this.parent_unit = parent_unit;
+        //decide whther we are on an enemy or a player
+        if (parent_unit.GetComponent<unit_control_script>() == null)
+        {
+            on_enemy = true;
+        }
+        else
+        {
+            on_enemy = false;
+        }
     }
 
     public Texture GetIcon()

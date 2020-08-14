@@ -6,12 +6,15 @@ using UnityEngine.UIElements;
 public class player_controller_script : MonoBehaviour
 {
     public List<GameObject> ManuallyAddedUnits;
-    public GameObject DebugSphere;
+    public GameObject AttackIndicator;
+    public GameObject MoveIndicator;
     List<GameObject> controlled_units;
     private GameObject main_unit;
     private ui_script ui;
     private Camera_script camera;
+    private Canvas canvas;
     private int gold;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -20,6 +23,7 @@ public class player_controller_script : MonoBehaviour
         //get the camera script
         camera = GetComponent<Camera_script>();
         controlled_units = new List<GameObject>();
+        canvas = GetComponent<Canvas>();
         //add all of the manually added units to the controlled units group
         foreach(GameObject unit in ManuallyAddedUnits)
         {
@@ -36,7 +40,7 @@ public class player_controller_script : MonoBehaviour
     void Update()
     {
         //check to see if the map was clicked
-        if (Input.GetMouseButtonDown((int)MouseButton.LeftMouse))
+        if (Input.GetMouseButtonDown((int)MouseButton.RightMouse))
         {
             RaycastHit hit;
             if (Physics.Raycast(GameObject.FindObjectOfType<Camera>().ScreenPointToRay(Input.mousePosition), out hit))
@@ -47,7 +51,15 @@ public class player_controller_script : MonoBehaviour
                     {
                         unit.GetComponent<unit_move_script>().MoveTo(hit.point);
                     }
-                    Instantiate(DebugSphere, hit.point, Quaternion.identity);
+                    Instantiate(MoveIndicator, hit.point, AttackIndicator.transform.rotation);
+                }
+                else if(hit.transform.tag == "Enemy")
+                {
+                    foreach(GameObject unit in controlled_units)
+                    {
+                        unit.GetComponent<unit_control_script>().SetAttackOrder(hit.transform.gameObject);
+                    }
+                    Instantiate(AttackIndicator, hit.point,AttackIndicator.transform.rotation);
                 }
             }
 
@@ -77,4 +89,10 @@ public class player_controller_script : MonoBehaviour
     {
         gold += amount;
     }
+
+    public Canvas GetCanvas()
+    {
+        return canvas;
+    }
+
 }

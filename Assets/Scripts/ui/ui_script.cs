@@ -9,16 +9,19 @@ using UnityEngine.UI;
 public class ui_script : MonoBehaviour
 {
     protected unit_control_script active_unit;
+    protected player_controller_script player_script;
     public RawImage hp_bar;
     public RawImage mana_bar;
     public Text health_text;
     public Text mana_text;
     public Text stat_text;
+    public Text gold_text;
     public RawImage ability1_image;
     public RawImage ability2_image;
     public RawImage ability3_image;
     public RawImage ability4_image;
     public RawImage ui_back;
+    public RawImage[] ItemImages = new RawImage[6];
     private float mana_bar_length;
     private float health_bar_length;
 
@@ -32,6 +35,9 @@ public class ui_script : MonoBehaviour
         health_bar_length = hp_bar.rectTransform.sizeDelta.x;
         // move the ui down to the bottom of the screen
         ui_back.rectTransform.anchoredPosition = new Vector2(Screen.width/2,ui_back.rectTransform.anchoredPosition.y);
+
+        //get the player script
+        player_script = GetComponentInParent<player_controller_script>();
     }
 
     public void SetActiveUnit(GameObject unit)
@@ -58,13 +64,16 @@ public class ui_script : MonoBehaviour
         mana_text.text = active_unit.GetMana() + "/" + active_unit.GetMaxMana() + " + " + (active_unit.GetManaRegen() + active_unit.GetAddedManaRegen());
         mana_bar.rectTransform.sizeDelta = new Vector2(mana_bar_length * active_unit.GetMana() / active_unit.GetMaxMana(), mana_bar.rectTransform.sizeDelta.y);
 
+        //update gold text
+        gold_text.text = "Gold: " + player_script.GetGold();
+
         //get pther stats
         StringBuilder str = new StringBuilder();
         str.Append("Strength: " + active_unit.GetStrength() + "\n");
         str.Append("Agility: " + active_unit.GetAgility() + "\n");
         str.Append("Intelligence: " + active_unit.GetIntelligence() + "\n");
-        str.Append("Attack damage: " + active_unit.GetDamage() + " + " + active_unit.GetAddedDamage() + "\n");
-        str.Append("Attack speed: " + active_unit.GetAttackSpeed() + " + " + active_unit.GetAddedAttackSpeed() + "\n");
+        str.Append("Attack damage: " + active_unit.GetBaseDamage() + " + " + active_unit.GetAddedDamage() + "\n");
+        str.Append("Attack speed: " + active_unit.GetAttackSpeed() + " + " + active_unit.GetAddedAttackSpeed() + " Total Attack Time:  " + active_unit.GetAttackTime() + "\n");
         str.Append("Move speed: " + active_unit.GetMovespeed() + " + " + active_unit.GetAddedMovespeed() + "\n");
         str.Append("Ability amp: " + active_unit.GetSpellamp() + " + " + active_unit.GetAddedSpellAmp() + "\n");
         stat_text.text = str.ToString();

@@ -37,8 +37,9 @@ public class unit_move_script : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(navmeshAgent.velocity.normalized);
     }
 
-    public void MoveTo(Vector3 position)
+    public void MoveTo(Vector3 position,float stopping_distance = 0)
     {
         navmeshAgent.destination = position;
+        navmeshAgent.stoppingDistance = stopping_distance;
     }
 }
