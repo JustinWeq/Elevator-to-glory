@@ -120,4 +120,14 @@ public class enemy_controller : MonoBehaviour
         this.can_cast = can_cast;
     }
 
+    public void RegisterBuff(Buff buff)
+    {
+
+    }
+
+    public void DeregisterBuff(Buff buff)
+    {
+
+    }
+
 }

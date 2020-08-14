@@ -608,6 +608,16 @@ public class unit_control_script : MonoBehaviour
         on_damaged_list.Remove(effect);
     }
 
+    public void RegisterBuff(Buff buff)
+    {
+
+    }
+
+    public void DeregisterBuff(Buff buff)
+    {
+
+    }
+
     public void SetAttackOrder(GameObject enemy)
     {
         attack_target = enemy;
