@@ -25,14 +25,9 @@ public class Bonk_script :   Ability
         return true;
     }
 
-    protected override string GetDescription()
+    public override string GetDescription()
     {
-        throw new System.NotImplementedException();
-    }
-
-    protected override string GetName()
-    {
-        throw new System.NotImplementedException();
+        return "Bonk!!!!!";
     }
 
     protected override void LevelUp()

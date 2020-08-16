@@ -9,14 +9,9 @@ public class RageMode_script : Ability
         throw new System.NotImplementedException();
     }
 
-    protected override string GetDescription()
+    public override string GetDescription()
     {
-        throw new System.NotImplementedException();
-    }
-
-    protected override string GetName()
-    {
-        throw new System.NotImplementedException();
+        return "Aangry!!111";
     }
 
     protected override void LevelUp()

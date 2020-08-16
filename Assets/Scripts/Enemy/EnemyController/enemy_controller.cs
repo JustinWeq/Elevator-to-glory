@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.UI;
 
 public class enemy_controller : MonoBehaviour
@@ -13,10 +14,13 @@ public class enemy_controller : MonoBehaviour
     public float BaseAttackTime;
     public float Damage;
     public float Armor;
+    public float MoveSpeed;
+    public float HealthBarHeight = 2.0f;
     public bool CanAttack = true;
     public bool CanMove = true;
     public bool CanCast = true;
     public bool _CanBeAttacked = true;
+    public GameObject BleedEffect;
     private float hp;
     private float mana;
     public GameObject[] Abilties;
@@ -29,6 +33,9 @@ public class enemy_controller : MonoBehaviour
     protected bool can_attack;
     protected bool can_move;
     protected bool can_cast;
+    protected bool is_dead;
+    protected unit_control_script target;
+    protected ParticleSystem bleed_system;
    // protected RawImage hp_bar_front;
    // protected RawImage hp_bar_back;
     // Start is called before the first frame update
@@ -43,6 +50,9 @@ public class enemy_controller : MonoBehaviour
         hp = MaxHp;
         //create the hp bar
         hp_bar = Instantiate(HpBar);
+        //create the bleed effect
+        bleed_system = Instantiate(BleedEffect, transform.position + Vector3.up * HealthBarHeight, Quaternion.identity, transform).GetComponent<ParticleSystem>();
+        bleed_system.Stop();
         //Get the player controller
         //player_controller = GameObject.Find("PlayerController").GetComponent<player_controller_script>();
         //get the camera
@@ -54,22 +64,32 @@ public class enemy_controller : MonoBehaviour
         can_be_attacked = _CanBeAttacked;
         can_move = CanMove;
         can_cast = CanCast;
+        //make sure the enemy is alive
+        is_dead = false;
     }
     // Update is called once per frame
     void Update()
     {
+        if(is_dead)
+        {
+            return;
+        }
         if (hp < 0.0001)
         {
             hp = 0;
-            gameObject.AddComponent<TargetFade>().Duration = 2.0f;
+            gameObject.AddComponent<DieAndFall>().Duration = 2.0f;
             can_be_attacked = false;
             //destroy hp bar
             Destroy(hp_bar);
+            Destroy(gameObject.GetComponent<NavMeshAgent>());
+            Destroy(gameObject.GetComponent<CapsuleCollider>());
+            Destroy(gameObject.GetComponent<NavMeshObstacle>());
+            is_dead = true;
             return;
         }
         //set hp bar position
         //hp_bar_back.transform.position = cam.WorldToScreenPoint(transform.position);
-        hp_controller.SetPosition(transform.position + Vector3.up*2.0f);
+        hp_controller.SetPosition(transform.position + Vector3.up*HealthBarHeight);
         //update the hp bars hp
         hp_controller.SetHpAndMaxHp(hp,MaxHp);
     }
@@ -85,6 +105,8 @@ public class enemy_controller : MonoBehaviour
     {
         if (hp <= 0)
             return;
+        //make the particle system activate
+        bleed_system.Play();
         hp -= amount * 1 - ((0.06f * Armor) / (1 + 0.06f * Math.Abs(Armor)));
     }
 
@@ -128,6 +150,11 @@ public class enemy_controller : MonoBehaviour
     public void DeregisterBuff(Buff buff)
     {
 
+    }
+
+    public Vector3 GetPosition()
+    {
+        return transform.position;
     }
 
 }

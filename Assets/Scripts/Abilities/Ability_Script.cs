@@ -22,7 +22,7 @@ public enum AbilityActivationType
 
 public abstract class Ability : MonoBehaviour
 {
-
+    public string Name;
     public float[] BaseCooldown;
     public float[] BaseManaCost;
     public float BaseCastTime;
@@ -39,6 +39,8 @@ public abstract class Ability : MonoBehaviour
     protected float cast_time;
     protected float cast_range;
     protected float mana_cost;
+    protected string name;
+
     protected int level;
     protected GameObject parent_unit;
     private bool on_enemy;
@@ -50,9 +52,7 @@ public abstract class Ability : MonoBehaviour
 
     protected abstract void LevelUp();
 
-    protected abstract string GetName();
-
-    protected abstract string GetDescription();
+    public abstract string GetDescription();
 
      public bool Level()
      {
@@ -79,6 +79,8 @@ public abstract class Ability : MonoBehaviour
         level = 0;
 
         on_enemy = false;
+
+        name = Name;
     }
 
 
@@ -158,6 +160,17 @@ public abstract class Ability : MonoBehaviour
     public float GetCastRange()
     {
         return cast_range;
+    }
+
+
+    public float GetCost()
+    {
+        return mana_cost;
+    }
+
+    public string GetName()
+    {
+        return name;
     }
 
 

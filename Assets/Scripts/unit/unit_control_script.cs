@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class unit_control_script : MonoBehaviour
 {
@@ -36,6 +37,7 @@ public class unit_control_script : MonoBehaviour
     public AttackType AttackStyle;
     public bool CustomUi = false;
     public GameObject[] Abilities = new GameObject[6];
+    public GameObject AnimationTarget;
     protected Ability[] abilitys = new Ability[6];
     protected float hp;
     protected float added_hp;
@@ -92,11 +94,12 @@ public class unit_control_script : MonoBehaviour
     protected const float BASE_MAGIC_RESIST = 25;
     protected int level;
     protected int ability_points;
-    protected GameObject attack_target = null;
+    protected enemy_controller attack_target = null;
     protected unit_move_script move_Script = null;
     private List<OnHit> on_hit_list;
     private List<OnDamaged> on_damaged_list;
     private List<OnAbilityHit> on_ability_hit_list;
+    private List<Buff> registered_buffs;
     private float windup;
 
 
@@ -207,6 +210,9 @@ public class unit_control_script : MonoBehaviour
         on_ability_hit_list = new List<OnAbilityHit>();
         on_damaged_list = new List<OnDamaged>();
         on_hit_list = new List<OnHit>();
+
+
+
     }
 
     public void LevelUp()
@@ -282,6 +288,10 @@ public class unit_control_script : MonoBehaviour
         return abilitys[index];
     }
 
+    public bool ActivateAbility(int index,GameObject target)
+    {
+        return abilitys[index].ActivateAbility(target);
+    }
     public float GetMaxMana()
     {
         return max_mana;
@@ -503,48 +513,13 @@ public class unit_control_script : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //check to see if any ability keys are being pressed
-        if(Input.GetKeyDown("q"))
-        {
-            if (abilitys[0] != null)
-                abilitys[0].ActivateAbility();
-        }
-        //check to see if any ability keys are being pressed
-        if (Input.GetKeyDown("w"))
-        {
-            if (abilitys[1] != null)
-                abilitys[1].ActivateAbility();
-        }
-        //check to see if any ability keys are being pressed
-        if (Input.GetKeyDown("e"))
-        {
-            if (abilitys[2] != null)
-                abilitys[2].ActivateAbility();
-        }
-        //check to see if any ability keys are being pressed
-        if (Input.GetKeyDown("r"))
-        {
-            if (abilitys[3] != null)
-                abilitys[3].ActivateAbility();
-        }
-        //check to see if any ability keys are being pressed
-        if (Input.GetKeyDown("f"))
-        {
-            if (abilitys[4] != null)
-                abilitys[4].ActivateAbility();
-        }
-        //check to see if any ability keys are being pressed
-        if (Input.GetKeyDown("d"))
-        {
-            if (abilitys[5] != null)
-                abilitys[5].ActivateAbility();
-        }
+        
 
 
         //check to see if we can attack the enemy
         if(attack_target != null && Vector3.Distance(attack_target.transform.position,transform.position) < GetAttackRange()/100.0f)
         {
-            windup -= Time.deltaTime; 
+            windup -= Time.deltaTime;
         }
         else
         {
@@ -610,17 +585,17 @@ public class unit_control_script : MonoBehaviour
 
     public void RegisterBuff(Buff buff)
     {
-
+        registered_buffs.Add(buff);
     }
 
     public void DeregisterBuff(Buff buff)
     {
-
+        registered_buffs.Remove(buff);
     }
 
     public void SetAttackOrder(GameObject enemy)
     {
-        attack_target = enemy;
+        attack_target = enemy.GetComponent<enemy_controller>();
         //move to the enemy minus the attack range and a percentage
         move_Script.MoveTo(enemy.transform.position,GetAttackRange()/100.0f-(GetAttackRange()/100.0f)*0.10f);
         //rotate towards the target

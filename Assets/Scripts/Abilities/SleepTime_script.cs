@@ -13,15 +13,11 @@ public class SleepTime_script : Ability
         throw new System.NotImplementedException();
     }
 
-    protected override string GetDescription()
+    public override string GetDescription()
     {
-        throw new System.NotImplementedException();
+        return "ZZZZ!!!!!";
     }
 
-    protected override string GetName()
-    {
-        throw new System.NotImplementedException();
-    }
 
     protected override void LevelUp()
     {

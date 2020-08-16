@@ -29,7 +29,6 @@ public class TargetFade : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        string[] propertys = renderer.material.GetTexturePropertyNames();
         //make the material more transparent
         renderer.material.color = originalColor * new Color(1, 1, 1, time_left / Duration);
         

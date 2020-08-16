@@ -1,9 +1,11 @@
 ﻿using Assets.Scripts;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class ui_script : MonoBehaviour
@@ -16,11 +18,11 @@ public class ui_script : MonoBehaviour
     public Text mana_text;
     public Text stat_text;
     public Text gold_text;
-    public RawImage ability1_image;
-    public RawImage ability2_image;
-    public RawImage ability3_image;
-    public RawImage ability4_image;
-    public RawImage ui_back;
+    public RawImage AbilityCardBack;
+    public RawImage UIBack;
+    public Text AbilityDescriptionText;
+    public Text AbilityCostText;
+    public RawImage[] AbilityIcons = new RawImage[4];
     public RawImage[] ItemImages = new RawImage[6];
     private float mana_bar_length;
     private float health_bar_length;
@@ -34,16 +36,41 @@ public class ui_script : MonoBehaviour
         mana_bar_length = mana_bar.rectTransform.sizeDelta.x;
         health_bar_length = hp_bar.rectTransform.sizeDelta.x;
         // move the ui down to the bottom of the screen
-        ui_back.rectTransform.anchoredPosition = new Vector2(Screen.width/2,ui_back.rectTransform.anchoredPosition.y);
+        // ui_back.rectTransform.anchoredPosition = new Vector2(Screen.width/2,ui_back.rectTransform.anchoredPosition.y);
 
         //get the player script
         player_script = GetComponentInParent<player_controller_script>();
+
+        //instantly hide the ability description
+        hideAbilityCard();
+
+        //add an event to all of the ability icons
+      //  AbilityIcons[0].gameObject.
     }
 
     public void SetActiveUnit(GameObject unit)
     {
         active_unit = unit.GetComponent<unit_control_script>();
         UpdateUiInfo();
+    }
+
+    private void hideAbilityCard()
+    {
+        AbilityDescriptionText.enabled = false;
+        AbilityCostText.enabled = false;
+        AbilityCardBack.enabled = false;
+    }
+
+    private void showAbilityCard(int index)
+    {
+        AbilityCardBack.enabled = true;
+        AbilityDescriptionText.enabled = true;
+        AbilityCostText.enabled = true;
+
+        //set the text and cost of the ability
+        AbilityCostText.text = "Mana: " + active_unit.GetAbility(index).GetCost() + " Cooldown: " + active_unit.GetAbility(index).GetCooldown();
+        AbilityDescriptionText.text = active_unit.GetAbility(index).GetDescription();
+        AbilityCardBack.rectTransform.position = new Vector3(AbilityIcons[index].rectTransform.position.x,AbilityCardBack.rectTransform.position.y,AbilityCardBack.transform.position.z);
     }
 
 
@@ -53,10 +80,10 @@ public class ui_script : MonoBehaviour
         //set the ability icons
         if (active_unit == null)
             return;
-        ability1_image.texture = active_unit.GetAbility(0).GetIcon();
-        ability2_image.texture = active_unit.GetAbility(1).GetIcon();
-        ability3_image.texture = active_unit.GetAbility(2).GetIcon();
-        ability4_image.texture = active_unit.GetAbility(3).GetIcon();
+        AbilityIcons[0].texture = active_unit.GetAbility(0).GetIcon();
+        AbilityIcons[1].texture = active_unit.GetAbility(1).GetIcon();
+        AbilityIcons[2].texture = active_unit.GetAbility(2).GetIcon();
+        AbilityIcons[3].texture = active_unit.GetAbility(3).GetIcon();
         //update the health bar
         health_text.text = active_unit.GetHp()+"/"+active_unit.GetMaxHp() + " + " + (active_unit.GetHpRegen() + active_unit.GetAddedHpRegen());
         hp_bar.rectTransform.sizeDelta = new Vector2(health_bar_length*active_unit.GetHp()/active_unit.GetMaxHp(), hp_bar.rectTransform.sizeDelta.y);
@@ -84,5 +111,21 @@ public class ui_script : MonoBehaviour
     void Update()
     {
         UpdateUiInfo();
+        bool over_icon = false;
+        //decide if the mouse is over an ability icon
+        for(int i = 0;i < 4;i++)
+        {
+            if (AbilityIcons[i].GetComponent<MouseOverDetector>().MouseIsOver())
+            {
+                showAbilityCard(i);
+                over_icon = true;
+            }
+
+        }
+
+        if(!over_icon)
+        {
+            hideAbilityCard();
+        }
     }
 }

@@ -19,7 +19,8 @@ public class unit_move_script : MonoBehaviour
         //disable rotation of the nav mesh
         navmeshAgent.updateRotation = false;
         navmeshAgent.angularSpeed = 0;
-        //navmeshAgent.
+        //set the stopping distance to be the same as the obstacle avoidance radius
+        navmeshAgent.stoppingDistance = 30;//navmeshAgent.radius*2;
     }
 
     // Update is called once per frame

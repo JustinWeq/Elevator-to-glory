@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Traversable
   - Enemy
+  - Shop
   layers:
   - Default
   - TransparentFX

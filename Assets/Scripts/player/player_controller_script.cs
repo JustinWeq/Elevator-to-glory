@@ -39,6 +39,36 @@ public class player_controller_script : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //check to see if any ability keys are being pressed
+        if (Input.GetKeyDown("q"))
+        {
+            attemptAbilityFire(0);
+        }
+        //check to see if any ability keys are being pressed
+        if (Input.GetKeyDown("w"))
+        {
+            attemptAbilityFire(1);
+        }
+        //check to see if any ability keys are being pressed
+        if (Input.GetKeyDown("e"))
+        {
+            attemptAbilityFire(2);
+        }
+        //check to see if any ability keys are being pressed
+        if (Input.GetKeyDown("r"))
+        {
+            attemptAbilityFire(3);
+        }
+        //check to see if any ability keys are being pressed
+        if (Input.GetKeyDown("f"))
+        {
+            attemptAbilityFire(4);
+        }
+        //check to see if any ability keys are being pressed
+        if (Input.GetKeyDown("d"))
+        {
+            attemptAbilityFire(5);
+        }
         //check to see if the map was clicked
         if (Input.GetMouseButtonDown((int)MouseButton.RightMouse))
         {
@@ -73,6 +103,11 @@ public class player_controller_script : MonoBehaviour
             return;
         }
         controlled_units.Add(unit);
+    }
+
+    private void attemptAbilityFire(int index)
+    {
+        Ability ability = main_unit.GetComponent<unit_control_script>().GetAbility(index);
     }
 
     public void RemoveFromControlled(GameObject unit)
