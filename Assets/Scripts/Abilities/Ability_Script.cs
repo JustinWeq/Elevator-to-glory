@@ -20,6 +20,15 @@ public enum AbilityActivationType
     Passive
 }
 
+public enum AbilityType
+{
+    Nuke,
+    Stun,
+    Buff,
+    Heal,
+    Passive
+}
+
 public abstract class Ability : MonoBehaviour
 {
     public string Name;
@@ -28,8 +37,10 @@ public abstract class Ability : MonoBehaviour
     public float BaseCastTime;
     public float[] BaseCastRange;
     public int can_be_leveled = 2;
+    public int CanBeLeveledAt = 1;
     public TargetType _TargetType;
     public AbilityActivationType ActivationType;
+    public AbilityType _AbilityType;
     public bool ImmunityPiercing;
     public bool NonPurgeable;
     public bool NonDispellable;
@@ -40,13 +51,20 @@ public abstract class Ability : MonoBehaviour
     protected float cast_range;
     protected float mana_cost;
     protected string name;
+    protected bool toggled_on;
 
-    protected int level;
+    private int level;
     protected GameObject parent_unit;
-    private bool on_enemy;
+    protected unit_control_script unit_control_handle;
+    protected enemy_controller enemy_control_handle;
+    protected bool on_enemy;
     public int MaxLevel;
 
-
+    public Ability()
+    {
+        level = 0;
+        toggled_on = true;
+    }
 
     public abstract bool ActivateAbility(GameObject target = null);
 
@@ -58,19 +76,33 @@ public abstract class Ability : MonoBehaviour
      {
         if (on_enemy)
             return false;
-        if (level < MaxLevel && parent_unit.GetComponent<unit_control_script>().GetLevel() > level*can_be_leveled)
+        if (CanLevel())
         {
             level++;
             //level stats
-            cooldown = BaseCooldown[level];
-            mana_cost = BaseManaCost[level];
-            cast_range = BaseCastRange[level];
+            cooldown = BaseCooldown[level-1];
+            mana_cost = BaseManaCost[level-1];
+            cast_range = BaseCastRange[level-1];
             LevelUp();
             return true;
         }
         return false;
      }
 
+    public int GetLevel()
+    {
+        return level;
+    }
+
+    public bool CanLevel()
+    {
+        return level < MaxLevel && unit_control_handle.GetLevel() >= CanBeLeveledAt && unit_control_handle.GetLevel() >= (level+1)* can_be_leveled;
+    }
+
+    public int GetMaxLevel()
+    {
+        return MaxLevel;
+    }
 
 
     // Start is called before the first frame update
@@ -84,17 +116,19 @@ public abstract class Ability : MonoBehaviour
     }
 
 
-    public void SetParentUnit(GameObject parent_unit)
+    public virtual void SetParentUnit(GameObject parent_unit)
     {
         this.parent_unit = parent_unit;
         //decide whther we are on an enemy or a player
         if (parent_unit.GetComponent<unit_control_script>() == null)
         {
             on_enemy = true;
+            enemy_control_handle = parent_unit.GetComponent<enemy_controller>();
         }
         else
         {
             on_enemy = false;
+            unit_control_handle = parent_unit.GetComponent<unit_control_script>();
         }
     }
 
@@ -108,34 +142,10 @@ public abstract class Ability : MonoBehaviour
     {
         if (remaining_cooldown > 0)
         {
-            remaining_cooldown -= 1.0f * Time.deltaTime;
+            remaining_cooldown -= Time.deltaTime;
         }
     }
 
-    public void ScaleManaCost(float scale)
-    {
-        mana_cost = BaseManaCost[level];
-        mana_cost *= scale;
-    }
-
-
-    public void ScaleCooldown(float scale)
-    {
-        cooldown = BaseManaCost[level];
-        cooldown *= scale;
-    }
-
-    public void ScaleCastRange(float scale)
-    {
-        cast_range = BaseCastRange[level];
-        cast_range *= scale;
-    }
-
-    public void ScaleCastTime(float scale)
-    {
-        cast_time = BaseCastTime;
-        cast_time *= scale;
-    }
 
     public bool OnCooldown()
     {
@@ -171,6 +181,11 @@ public abstract class Ability : MonoBehaviour
     public string GetName()
     {
         return name;
+    }
+
+    public void Toggle()
+    {
+        toggled_on = !toggled_on;
     }
 
 

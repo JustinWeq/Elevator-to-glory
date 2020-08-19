@@ -9,6 +9,6 @@ namespace Assets.Scripts
 {
     public interface OnAbilityHit
     {
-        void OnAbilityHit(GameObject target);
+        void OnAbilityHit(ref float damage,GameObject target);
     }
 }

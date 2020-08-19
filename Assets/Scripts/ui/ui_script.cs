@@ -7,6 +7,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class ui_script : MonoBehaviour
 {
@@ -18,25 +19,36 @@ public class ui_script : MonoBehaviour
     public Text mana_text;
     public Text stat_text;
     public Text gold_text;
+    public Text LevelText;
+    public Text SkillPointText;
+    public Text LevelObjectiveText;
+    public Text[] AbilityCooldownTexts = new Text[4];
     public RawImage AbilityCardBack;
     public RawImage UIBack;
     public Text AbilityDescriptionText;
     public Text AbilityCostText;
     public RawImage[] AbilityIcons = new RawImage[4];
+    public RawImage[] AbilityIconTints = new RawImage[4];
     public RawImage[] ItemImages = new RawImage[6];
+    public RawImage LevelIndicator;
+    public Texture LeveledTexture;
+    public Texture UnLeveledTexture;
+    public UnityEngine.UI.Button LevelUpButton;
+    public InputField GoldAmountField;
+    public UnityEngine.UI.Button GiveGoldButton;
+    private RawImage[][] level_indicators = new RawImage[4][];
+    private float[] normal_tint_heights = new float[4];
     private float mana_bar_length;
     private float health_bar_length;
+    private bool leveling_mode;
 
 
     // Start is called before the first frame update
     void Awake()
     {
         //get the ui elements
-
         mana_bar_length = mana_bar.rectTransform.sizeDelta.x;
         health_bar_length = hp_bar.rectTransform.sizeDelta.x;
-        // move the ui down to the bottom of the screen
-        // ui_back.rectTransform.anchoredPosition = new Vector2(Screen.width/2,ui_back.rectTransform.anchoredPosition.y);
 
         //get the player script
         player_script = GetComponentInParent<player_controller_script>();
@@ -44,14 +56,31 @@ public class ui_script : MonoBehaviour
         //instantly hide the ability description
         hideAbilityCard();
 
-        //add an event to all of the ability icons
-      //  AbilityIcons[0].gameObject.
+
+        //get the normal heights of all of the tints
+        for (int i = 0; i < AbilityIcons.Length; i++)
+        {
+            normal_tint_heights[i] = AbilityIconTints[i].rectTransform.sizeDelta.y;
+        }
+        //set the leveling mode to fgalse
+        leveling_mode = false;
+
+        GiveGoldButton.onClick.AddListener(GiveGoldBtnClicked);
+        LevelUpButton.onClick.AddListener(LevelUpBtnClicked);
+
     }
 
-    public void SetActiveUnit(GameObject unit)
+    void GiveGoldBtnClicked()
     {
-        active_unit = unit.GetComponent<unit_control_script>();
-        UpdateUiInfo();
+        //give the player the gold amount in the field
+        player_script.AddGold(int.Parse(GoldAmountField.text));
+    }
+
+    public void SetActiveUnit(unit_control_script unit)
+    {
+        active_unit = unit;
+        //set up the level indicators
+        setupLevelIndicators();
     }
 
     private void hideAbilityCard()
@@ -69,10 +98,121 @@ public class ui_script : MonoBehaviour
 
         //set the text and cost of the ability
         AbilityCostText.text = "Mana: " + active_unit.GetAbility(index).GetCost() + " Cooldown: " + active_unit.GetAbility(index).GetCooldown();
-        AbilityDescriptionText.text = active_unit.GetAbility(index).GetDescription();
+        AbilityDescriptionText.text =active_unit.GetAbility(index).GetName() + "\n" +  active_unit.GetAbility(index).GetDescription();
         AbilityCardBack.rectTransform.position = new Vector3(AbilityIcons[index].rectTransform.position.x,AbilityCardBack.rectTransform.position.y,AbilityCardBack.transform.position.z);
+
+        //set the level text
+        LevelText.text = "Level: " + active_unit.GetLevel();
     }
 
+    public void EnterLevelStatus()
+    {
+        leveling_mode = true;
+        //go through all of the ability icons and check to see if they can be leveled
+        for(int i =0;i < AbilityIcons.Length;i++)
+        {
+            if (active_unit.GetAbility(i).CanLevel())
+            {
+                AbilityIconTints[i].enabled = true;
+                AbilityIconTints[i].color = Color.yellow*new Color(1,1,1,0.5f);
+            }
+            else
+            {
+                AbilityIconTints[i].enabled = true;
+                AbilityIconTints[i].color = Color.black * new Color(1, 1, 1, 0.5f);
+            }
+        }
+    }
+
+    private void setupLevelIndicators()
+    {
+        for (int i = 0; i < AbilityIcons.Length; i++)
+        {
+            if(level_indicators[i] == null)
+            level_indicators[i] = new RawImage[active_unit.GetAbility(i).GetMaxLevel()];
+            for (int j = 0; j < active_unit.GetAbility(i).GetMaxLevel(); j++)
+            {
+                if (level_indicators[i][j] != null)
+                    Destroy(level_indicators[i][j]);
+                RawImage img = Instantiate(LevelIndicator,AbilityIcons[i].transform);
+                int max_level = active_unit.GetAbility(i).GetMaxLevel();
+                img.rectTransform.anchoredPosition += j * Vector2.up * (AbilityIcons[i].rectTransform.sizeDelta.y / max_level);
+                img.texture = UnLeveledTexture;
+                level_indicators[i][j] = img;
+            }
+        }
+    }
+
+    public bool IsInLevelingMode()
+    {
+
+        return leveling_mode;
+    }
+
+    public void ExitLevelStatus()
+    {
+        leveling_mode = false;
+        for (int i = 0; i < AbilityIcons.Length; i++)
+        {
+            if (active_unit.GetAbility(i).GetLevel() < 1)
+            {
+                AbilityIconTints[i].color = Color.black * new Color(1, 1, 1, 0.5f);
+            }
+            else
+            {
+                AbilityIconTints[i].color = Color.black * new Color(1, 1, 1, 0.5f);
+                AbilityIconTints[i].enabled = false;
+            }
+        }
+    }
+
+
+
+    public void DisableAbilitys()
+    {
+        for(int i = 0;i< AbilityIcons.Length;i++)
+        {
+            AbilityIconTints[i].enabled = true;
+        }
+    }
+
+    public void EnableAbilitys()
+    {
+        for (int i = 0; i < AbilityIcons.Length; i++)
+        {
+            if (active_unit.GetAbility(i).GetLevel() > 0)
+                AbilityIconTints[i].enabled = true;
+        }
+    }
+
+    public void UpdateCooldowns()
+    {
+        for (int i = 0; i < AbilityIcons.Length;i++)
+        {
+            if(active_unit.GetAbility(i).OnCooldown())
+            {
+                AbilityIconTints[i].enabled = true;
+                AbilityIconTints[i].rectTransform.sizeDelta = new Vector2(AbilityIconTints[i].rectTransform.sizeDelta.x,
+                    normal_tint_heights[i] * (active_unit.GetAbility(i).GetRemainingCooldown() / active_unit.GetAbility(i).GetCooldown()));
+                AbilityCooldownTexts[i].enabled = true;
+                AbilityCooldownTexts[i].text = "" + active_unit.GetAbility(i).GetRemainingCooldown();
+            }
+            else
+            {
+                AbilityCooldownTexts[i].enabled = false;
+                if (active_unit.GetAbility(i).GetLevel() > 0 && leveling_mode == false)
+                    AbilityIconTints[i].enabled = false;
+                else
+                    AbilityIconTints[i].enabled = true;
+            }
+        }
+    }
+
+    public void LevelUpBtnClicked()
+    {
+        //add enough xp for the player to levelup
+        active_unit.AddExperience(unit_control_script.XP_NEEDED_FOR_LEVEL);
+    }
 
 
     protected void UpdateUiInfo()
@@ -85,10 +225,10 @@ public class ui_script : MonoBehaviour
         AbilityIcons[2].texture = active_unit.GetAbility(2).GetIcon();
         AbilityIcons[3].texture = active_unit.GetAbility(3).GetIcon();
         //update the health bar
-        health_text.text = active_unit.GetHp()+"/"+active_unit.GetMaxHp() + " + " + (active_unit.GetHpRegen() + active_unit.GetAddedHpRegen());
+        health_text.text = (int)active_unit.GetHp()+"/"+(int)active_unit.GetMaxHp() + " + " + (int)(active_unit.GetHpRegen() + active_unit.GetAddedHpRegen());
         hp_bar.rectTransform.sizeDelta = new Vector2(health_bar_length*active_unit.GetHp()/active_unit.GetMaxHp(), hp_bar.rectTransform.sizeDelta.y);
         //update the mana bar
-        mana_text.text = active_unit.GetMana() + "/" + active_unit.GetMaxMana() + " + " + (active_unit.GetManaRegen() + active_unit.GetAddedManaRegen());
+        mana_text.text = (int)active_unit.GetMana() + "/" + (int)active_unit.GetMaxMana() + " + " + (int)(active_unit.GetManaRegen() + active_unit.GetAddedManaRegen());
         mana_bar.rectTransform.sizeDelta = new Vector2(mana_bar_length * active_unit.GetMana() / active_unit.GetMaxMana(), mana_bar.rectTransform.sizeDelta.y);
 
         //update gold text
@@ -99,11 +239,38 @@ public class ui_script : MonoBehaviour
         str.Append("Strength: " + active_unit.GetStrength() + "\n");
         str.Append("Agility: " + active_unit.GetAgility() + "\n");
         str.Append("Intelligence: " + active_unit.GetIntelligence() + "\n");
-        str.Append("Attack damage: " + active_unit.GetBaseDamage() + " + " + active_unit.GetAddedDamage() + "\n");
-        str.Append("Attack speed: " + active_unit.GetAttackSpeed() + " + " + active_unit.GetAddedAttackSpeed() + " Total Attack Time:  " + active_unit.GetAttackTime() + "\n");
-        str.Append("Move speed: " + active_unit.GetMovespeed() + " + " + active_unit.GetAddedMovespeed() + "\n");
+        str.Append("Attack damage: " + (int)active_unit.GetBaseDamage() + " + " + (int)active_unit.GetAddedDamage() + "\n");
+        str.Append("Attack speed: " + (int)active_unit.GetAttackSpeed() + " + " + (int)active_unit.GetAddedAttackSpeed() + " Total Attack Time:  " + active_unit.GetAttackTime() + "\n");
+        str.Append("Move speed: " + (int)active_unit.GetMovespeed() + " + " + (int)active_unit.GetAddedMovespeed() + "\n");
         str.Append("Ability amp: " + active_unit.GetSpellamp() + " + " + active_unit.GetAddedSpellAmp() + "\n");
         stat_text.text = str.ToString();
+        //display the amount of skill points
+        SkillPointText.text = "Skill points: " + active_unit.GetSkillPoints();
+        //set the level text
+        LevelText.text = "Level: " + active_unit.GetLevel();
+
+        //update the cooldowns
+        UpdateCooldowns();
+
+        //check to see if the player has clicked on a level
+        if(Input.GetMouseButtonDown(0) && leveling_mode)
+        {
+            //check to see if the ability can be leveled
+            for (int i = 0; i < AbilityIcons.Length; i++)
+            {
+                if(AbilityIcons[i].GetComponent<MouseOverDetector>().MouseIsOver() && active_unit.GetAbility(i).CanLevel())
+                {
+                    active_unit.GetAbility(i).Level();
+                    level_indicators[i][active_unit.GetAbility(i).GetLevel() - 1].texture = LeveledTexture;
+                    //reduce the ability points
+                    active_unit.AddSkillPoints(-1);
+                    ExitLevelStatus();
+                }
+            }
+        }
+
+        //update the level objective text
+        LevelObjectiveText.text = level_manager.GetLevelManager().GetDescription();
 
     }
 

@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Assets.Scripts
 {
     public interface OnDamaged
     {
-         float OnDamaged(float damage);
+         void OnDamaged(ref float damage,GameObject attacker);
     }
 }

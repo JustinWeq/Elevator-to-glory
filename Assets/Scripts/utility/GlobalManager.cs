@@ -8,6 +8,7 @@ public class GlobalManager
     private Camera camera;
     private player_controller_script player_controller;
     private game_manager _game_manager;
+    private level_manager _level_manager;
     private Canvas canvas;
 
     private GlobalManager()
@@ -44,5 +45,20 @@ public class GlobalManager
     public Canvas GetCanvas()
     {
         return canvas;
+    }
+
+    public level_manager GetLevelManager()
+    {
+        return _level_manager;
+    }
+
+    public void SetGameManager(game_manager manager)
+    {
+        _game_manager = manager;
+    }
+
+    public void SetLevelManager(level_manager manager)
+    {
+        _level_manager = manager;
     }
 }

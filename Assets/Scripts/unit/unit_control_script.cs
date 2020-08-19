@@ -38,6 +38,8 @@ public class unit_control_script : MonoBehaviour
     public bool CustomUi = false;
     public GameObject[] Abilities = new GameObject[6];
     public GameObject AnimationTarget;
+    public ParticleSystem BleedEffect;
+    private ParticleSystem bleed_system;
     protected Ability[] abilitys = new Ability[6];
     protected float hp;
     protected float added_hp;
@@ -83,6 +85,13 @@ public class unit_control_script : MonoBehaviour
     protected bool can_cast_abilities;
     protected bool can_use_passives;
     protected bool can_use_item_abilities;
+    protected bool can_be_controlled;
+    protected bool can_die;
+    protected bool can_heal;
+    protected bool is_dead;
+    protected bool magic_immune;
+    protected bool damage_immune;
+    protected bool physical_damage_immune;
     protected int experience;
     protected const float MANA_SCALER = 14;
     protected const float MANA_REGEN_SCALER = 0.015f;
@@ -92,16 +101,17 @@ public class unit_control_script : MonoBehaviour
     protected const float SPELL_AMP_SCALER = 0.05f;
     protected const float MovespeedScaler = 0.5f;
     protected const float BASE_MAGIC_RESIST = 25;
+    public const int XP_NEEDED_FOR_LEVEL = 1000;
     protected int level;
     protected int ability_points;
     protected enemy_controller attack_target = null;
     protected unit_move_script move_Script = null;
-    private List<OnHit> on_hit_list;
-    private List<OnDamaged> on_damaged_list;
-    private List<OnAbilityHit> on_ability_hit_list;
-    private List<Buff> registered_buffs;
+    private List<OnHit> on_hit_list = new List<OnHit>();
+    private List<OnDamaged> on_damaged_list = new List<OnDamaged>();
+    private List<OnAbilityHit> on_ability_hit_list = new List<OnAbilityHit>();
+    private List<Buff> registered_buffs = new List<Buff>();
     private float windup;
-
+    private int owner_id;
 
 
     // Start is called before the first frame update
@@ -170,7 +180,10 @@ public class unit_control_script : MonoBehaviour
         {
             if(Abilities[i] != null)
             {
-                abilitys[i] = Abilities[i].GetComponent<Ability>();
+
+                abilitys[i] = Instantiate(Abilities[i].GetComponent<Ability>());
+                //set the abilitys parent
+                abilitys[i].SetParentUnit(gameObject);
             }
         }
 
@@ -206,13 +219,43 @@ public class unit_control_script : MonoBehaviour
         critical_damage = 1;
         critical_chance = 0;
 
-        //init lists
-        on_ability_hit_list = new List<OnAbilityHit>();
-        on_damaged_list = new List<OnDamaged>();
-        on_hit_list = new List<OnHit>();
+        //initialize starting statuses
+        can_attack = true;
+        can_be_controlled = true;
+        can_cast_abilities = true;
+        can_move = true;
+        can_use_item_abilities = true;
+        can_use_passives = true;
+        can_die = true;
+        can_heal = true;
+        damage_immune = false;
+        magic_immune = false;
+        physical_damage_immune = false;
+
+        //add self to player units
+        level_manager.GetLevelManager().AddPlayerUnit(this);
+
+        //set up the bleed effect system
+        bleed_system = Instantiate(BleedEffect, transform.position + Vector3.up * 3, Quaternion.identity, transform).GetComponent<ParticleSystem>();
+        bleed_system.Stop();
+
+    }
 
 
+    public void AddSkillPoints(int amount)
+    {
+        ability_points += amount;
+    }
 
+    public void AddExperience(int amount)
+    {
+        //level up for each amount of xp over the amount needed to level
+        experience += amount;
+        for (int i = 0; i < experience/XP_NEEDED_FOR_LEVEL; i++)
+        {
+            LevelUp();
+        }
+        experience %= XP_NEEDED_FOR_LEVEL;
     }
 
     public void LevelUp()
@@ -309,7 +352,7 @@ public class unit_control_script : MonoBehaviour
 
     public float GetHp()
     {
-        return max_hp;
+        return hp;
     }
 
     public void AddMana(float amount)
@@ -339,6 +382,16 @@ public class unit_control_script : MonoBehaviour
     public float GetBaseDamage()
     {
         return damage;
+    }
+
+    public void SetCanDie(bool can_die)
+    {
+        this.can_die = can_die;
+    }
+
+    public bool GetCanDie(bool can_die)
+    {
+        return can_die;
     }
 
     public float GetDamage()
@@ -395,9 +448,14 @@ public class unit_control_script : MonoBehaviour
         return (int)added_attack_speed;
     }
 
-    public float GetArmor()
+    public float GetBaseArmor()
     {
         return armor;
+    }
+
+    public float GetArmor()
+    {
+        return armor + added_armor;
     }
 
     public float GetAddedArmor()
@@ -408,6 +466,11 @@ public class unit_control_script : MonoBehaviour
     public float GetMovespeed()
     {
         return movespeed;
+    }
+
+    public void add_movespeed(float amount)
+    {
+        added_movespeed += amount;
     }
 
     public float GetAddedMovespeed()
@@ -453,6 +516,16 @@ public class unit_control_script : MonoBehaviour
     public float GetAttackRange()
     {
         return BaseAttackRange + attack_range;
+    }
+
+    public void AddBaseAttackTime(float amount)
+    {
+        BaseAttackTime += amount;
+    }
+
+    public float GetBaseAttackTime()
+    {
+        return BaseAttackTime;
     }
 
     public float GetSpellLifesteal()
@@ -505,6 +578,11 @@ public class unit_control_script : MonoBehaviour
         return critical_chance;
     }
 
+    public int GetSkillPoints()
+    {
+        return ability_points;
+    }
+
 
 
 
@@ -513,13 +591,45 @@ public class unit_control_script : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (is_dead)
+            return;
+        move_Script.CorrectRotation();
+
+        //check to see if we are dead
+        if (hp < 1)
+        {
+            if(can_die)
+            {
+                hp = 0;
+                is_dead = true;
+            }
+            else
+            {
+                hp = 1.001f;
+            }
+        }
+
+        if (can_heal)
+            hp += (added_hp_regen + hp_regen)*Time.deltaTime;
+        if (hp > max_hp)
+            hp = max_hp;
+
+        //regen mana
+        mana += (mana_regen+added_mana_regen)*Time.deltaTime;
+        if(mana > max_mana)
+        {
+            mana = max_mana;
+        }
 
 
         //check to see if we can attack the enemy
         if(attack_target != null && Vector3.Distance(attack_target.transform.position,transform.position) < GetAttackRange()/100.0f)
         {
             windup -= Time.deltaTime;
+            transform.rotation = Quaternion.LookRotation(new Vector3(attack_target.GetPosition().x, attack_target.GetPosition().z));
+            transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
+            if (!can_attack)
+                ResetWindup();
         }
         else
         {
@@ -527,11 +637,35 @@ public class unit_control_script : MonoBehaviour
             ResetWindup();
         }
 
-        if(windup <= 0)
+        if(windup <= 0 && can_attack)
         {
             //attack the enemy target
             AttackEnemy();
         }
+    }
+
+    public void Damage(float amount,enemy_controller attacker)
+    {
+        if (is_dead || physical_damage_immune || damage_immune)
+            return;
+        //go through all of the effects
+        float fixed_damage = amount;
+        foreach(OnHit effect in on_hit_list)
+        {
+            effect.OnHit(ref fixed_damage, attacker.gameObject);
+        }
+        //make the particle system activate
+        bleed_system.Play();
+        hp -= fixed_damage * 1 - ((0.06f * GetArmor()) / (1 + 0.06f * Mathf.Abs(GetArmor())));
+        if (can_be_controlled && attack_target == null)
+        {
+            SetAttackOrder(attacker.gameObject);
+        }
+    }
+
+    public void Heal(float amount)
+    {
+        hp += amount;
     }
 
     private void ResetWindup()
@@ -546,6 +680,7 @@ public class unit_control_script : MonoBehaviour
 
     private void AttackEnemy()
     {
+        FaceTowardsTarget(attack_target.GetPosition());
         //set wind up back to start
         ResetWindup();
         //calculate damage
@@ -558,8 +693,14 @@ public class unit_control_script : MonoBehaviour
         total_damage += total_damage * crit_multiply * critical_damage;
         total_damage += pure_damage;
         //damage the enemy target
-        attack_target.GetComponent<enemy_controller>().DamageEnemy(total_damage);
+        attack_target.GetComponent<enemy_controller>().DamageEnemy(total_damage,this);
 
+    }
+
+    public void FaceTowardsTarget(Vector3 target)
+    {
+        transform.rotation = Quaternion.LookRotation(new Vector3(target.x, target.z));
+        transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
     }
 
 
@@ -599,7 +740,98 @@ public class unit_control_script : MonoBehaviour
         //move to the enemy minus the attack range and a percentage
         move_Script.MoveTo(enemy.transform.position,GetAttackRange()/100.0f-(GetAttackRange()/100.0f)*0.10f);
         //rotate towards the target
-        transform.LookAt(new Vector3(enemy.transform.position.x,enemy.transform.position.y,enemy.transform.position.z), -Vector3.up);
+        transform.rotation = Quaternion.LookRotation(new Vector3(attack_target.GetPosition().x,transform.position.y, attack_target.GetPosition().z));
+        transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
     }
+
+    public void SetPlayerId(int player_id)
+    {
+        owner_id = player_id;
+    }
+
+    public int GetOwnerId()
+    {
+        return owner_id;
+    }
+
+    public Vector3 GetPosition()
+    {
+        return transform.position;
+    }
+
+    public void SetCanMove(bool can_move)
+    {
+        this.can_move = can_move;
+    }
+
+    public bool GetCanMove()
+    {
+        return can_move;
+    }
+
+    public void SetCanAttack(bool can_attack)
+    {
+        this.can_attack = can_attack;
+    }
+
+
+    public bool GetCanAttack()
+    {
+        return can_attack;
+    }
+
+    public void SetCanCast(bool can_cast)
+    {
+        this.can_cast_abilities = can_cast;
+    }
+
+    public bool GetCanCast()
+    {
+        return this.can_cast_abilities;
+    }
+
+    public bool GetCanOrder()
+    {
+        return this.can_be_controlled;
+    }
+
+    public void SetCanOrder(bool can_order)
+    {
+        this.can_be_controlled = can_order;
+    }
+
+    public void SetPhysicalDamageImmune(bool immune)
+    {
+        physical_damage_immune = immune;
+    }
+
+    public void SetDamageImmune(bool immune)
+    {
+        damage_immune = immune;
+    }
+
+    public void SetMagicDamageImmune(bool immune)
+    {
+        magic_immune = immune;
+    }
+
+    public void RemoveHp(float amount, bool physical = false)
+    {
+        if (physical && physical_damage_immune)
+            return;
+
+        if (magic_immune)
+            return;
+
+        hp -= amount;
+    }
+
+    public void PureDamage(float amount)
+    {
+        if (damage_immune)
+            return;
+        hp -= amount;
+    }
+
 
 }

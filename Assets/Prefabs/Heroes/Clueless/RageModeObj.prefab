@@ -43,21 +43,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eccdf60734375c549ab242a015bcc022, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Name: Rage!!!
   BaseCooldown:
-  - 0
-  - 0
-  - 0
+  - 130
+  - 100
+  - 70
+  - 40
   BaseManaCost:
-  - 0
-  - 0
-  - 0
+  - 200
+  - 200
+  - 200
+  - 200
   BaseCastTime: 0
-  BaseCastRange: []
-  can_be_leveled: 2
+  BaseCastRange:
+  - 0
+  - 0
+  - 0
+  - 0
+  can_be_leveled: 5
+  CanBeLeveledAt: 6
   _TargetType: 5
   ActivationType: 0
-  ImmunityPiercing: 0
-  NonPurgeable: 0
-  NonDispellable: 0
+  _AbilityType: 2
+  ImmunityPiercing: 1
+  NonPurgeable: 1
+  NonDispellable: 1
   Thumbnail: {fileID: 2800000, guid: cbd1c1684640ad7458e5c6f5d68ac7f3, type: 3}
   MaxLevel: 4
+  Duration:
+  - 10
+  - 12
+  - 14
+  - 16
+  MinimumHp:
+  - 100
+  - 200
+  - 300
+  - 400
+  MinAttackSpeedReduction: 10
+  MaxAttackSpeedReduction: 40
+  MoveSpeedIncrease: 15

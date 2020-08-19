@@ -10,7 +10,7 @@ public class Camera_script : MonoBehaviour
     public float CAMERA_START_HEIGHT = 15;
     public float MAX_HEIGHT = 100;
     public float MIN_HEIGHT = 5;
-    private GameObject active_unit;
+    private unit_control_script active_unit;
     // Start is called before the first frame update
     void Start()
     {
@@ -19,7 +19,7 @@ public class Camera_script : MonoBehaviour
         transform.position = new Vector3(0, CAMERA_START_HEIGHT, 0);
     }
 
-    public void SetActiveUnit(GameObject unit)
+    public void SetActiveUnit(unit_control_script unit)
     {
         active_unit = unit;
     }

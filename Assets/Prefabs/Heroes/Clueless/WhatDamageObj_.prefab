@@ -43,13 +43,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff767f73b043e1143932d4d32baccec3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BaseCooldown: []
-  BaseManaCost: []
+  Name: Damage???
+  BaseCooldown:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  BaseManaCost:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
   BaseCastTime: 0
-  BaseCastRange: []
-  can_be_leveled: 2
+  BaseCastRange:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  can_be_leveled: 1
+  CanBeLeveledAt: 1
   _TargetType: 5
   ActivationType: 2
+  _AbilityType: 4
   ImmunityPiercing: 1
   NonPurgeable: 1
   NonDispellable: 1

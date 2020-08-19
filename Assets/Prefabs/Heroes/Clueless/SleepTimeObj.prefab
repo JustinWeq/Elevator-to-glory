@@ -43,6 +43,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7176f2a542e2c6847a1c8388fa8b3a1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Name: Sleep!!!
   BaseCooldown:
   - 40
   - 36
@@ -58,10 +59,18 @@ MonoBehaviour:
   - 150
   - 150
   BaseCastTime: 1
-  BaseCastRange: []
-  can_be_leveled: 2
+  BaseCastRange:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  can_be_leveled: 1
+  CanBeLeveledAt: 1
   _TargetType: 5
-  ActivationType: 3
+  ActivationType: 0
+  _AbilityType: 3
   ImmunityPiercing: 0
   NonPurgeable: 0
   NonDispellable: 0

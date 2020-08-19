@@ -26,16 +26,25 @@ public class unit_move_script : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //set the speed on the nav mesh agent to that of the unit
-        navmeshAgent.speed = (unit.GetMovespeed() + unit.GetAddedMovespeed())/10;
-        navmeshAgent.acceleration = unit.GetMovespeed() + unit.GetAddedMovespeed();
+        if (unit.GetCanMove())
+        {
+            //set the speed on the nav mesh agent to that of the unit
+            navmeshAgent.speed = (unit.GetMovespeed() + unit.GetAddedMovespeed()) / 10;
+            navmeshAgent.acceleration = unit.GetMovespeed() + unit.GetAddedMovespeed();
+        }
+        else
+        {
+            navmeshAgent.speed = 0;
+            navmeshAgent.acceleration = 0;
+        }
         
     }
 
-    void LateUpdate()
+    public void CorrectRotation()
     {
-        if(navmeshAgent.velocity.sqrMagnitude > Mathf.Epsilon)
+        if (navmeshAgent.velocity.sqrMagnitude > Mathf.Epsilon)
             transform.rotation = Quaternion.LookRotation(navmeshAgent.velocity.normalized);
+        transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
     }
 
     public void MoveTo(Vector3 position,float stopping_distance = 0)
