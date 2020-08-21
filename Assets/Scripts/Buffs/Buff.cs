@@ -16,9 +16,6 @@ public abstract class Buff : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        //set the duration
-        time_left = 3.0f;
-        on_enemy = false;
 
 
     }
@@ -34,16 +31,22 @@ public abstract class Buff : MonoBehaviour
     {
         //reduce time left
         time_left -= Time.deltaTime;
+        if(owner == null)
+        {
+            Destroy(gameObject);
+        }
         BuffEffect();
         if(time_left <= 0)
         {
 
             if (on_enemy)
             {
+                if(enemy_handle != null)
                 enemy_handle.DeregisterBuff(this);
             }
             else
             {
+                if(unit_handle != null)
                 unit_handle.DeregisterBuff(this);
 
             }
@@ -53,11 +56,17 @@ public abstract class Buff : MonoBehaviour
 
     protected virtual void OnDestroy()
     {
+        if (owner == null)
+            return;
         if(on_enemy)
         {
+            if (enemy_handle == null)
+                return;
             enemy_handle.DeregisterBuff(this);
             return;
         }
+        if (unit_handle == null)
+            return;
         unit_handle.DeregisterBuff(this);
     }
 

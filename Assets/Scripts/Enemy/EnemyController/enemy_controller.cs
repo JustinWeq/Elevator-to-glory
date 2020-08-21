@@ -130,6 +130,9 @@ public class enemy_controller : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        int reee;
+        if (can_move == !CanMove)
+            reee = 3;
         if(is_dead)
         {
             return;
@@ -192,9 +195,17 @@ public class enemy_controller : MonoBehaviour
             nav_agent.angularSpeed = MoveSpeed;
             nav_agent.acceleration = MoveSpeed;
         }
+        else
+        {
+            if (nav_agent != null)
+            {
+                nav_agent.speed = 0;
+                nav_agent.acceleration = 0;
+            }
+        }
 
         //check to see if we can attack the player
-        if (target != null && Vector3.Distance(target.transform.position, transform.position) < AttackRange / 100.0f)
+        if (can_attack && target != null && Vector3.Distance(target.transform.position, transform.position) < AttackRange / 100.0f)
         {
             windup -= Time.deltaTime;
         }
@@ -362,6 +373,11 @@ public class enemy_controller : MonoBehaviour
     public bool IsCaptain()
     {
         return is_captain;
+    }
+
+    public bool IsDead()
+    {
+        return is_dead;
     }
 
 

@@ -36,6 +36,9 @@ public class ui_script : MonoBehaviour
     public UnityEngine.UI.Button LevelUpButton;
     public InputField GoldAmountField;
     public UnityEngine.UI.Button GiveGoldButton;
+    public UnityEngine.UI.Button ResetButton;
+    public UnityEngine.UI.Button ToggleSpawners;
+    public UnityEngine.UI.Button RespawnButton;
     private RawImage[][] level_indicators = new RawImage[4][];
     private float[] normal_tint_heights = new float[4];
     private float mana_bar_length;
@@ -67,6 +70,9 @@ public class ui_script : MonoBehaviour
 
         GiveGoldButton.onClick.AddListener(GiveGoldBtnClicked);
         LevelUpButton.onClick.AddListener(LevelUpBtnClicked);
+        ResetButton.onClick.AddListener(ResetBtnClicked);
+        RespawnButton.onClick.AddListener(RespawnBtnClicked);
+        ToggleSpawners.onClick.AddListener(ToggleSpawnersBtnClicked);
 
     }
 
@@ -74,6 +80,21 @@ public class ui_script : MonoBehaviour
     {
         //give the player the gold amount in the field
         player_script.AddGold(int.Parse(GoldAmountField.text));
+    }
+
+    void RespawnBtnClicked()
+    {
+
+    }
+
+    void ResetBtnClicked()
+    {
+
+    }
+
+    void ToggleSpawnersBtnClicked()
+    {
+
     }
 
     public void SetActiveUnit(unit_control_script unit)

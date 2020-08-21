@@ -13,23 +13,28 @@ namespace Assets.Scripts.Buffs
             //make sure the owner cannot move
             if(on_enemy)
             {
+                if (enemy_handle == null)
+                    return;
                 enemy_handle.SetCanMove(false);
                 enemy_handle.SetCanCast(false);
                 enemy_handle.SetCanAttack(false);
             }
             else
             {
+                if (unit_handle == null)
+                    return;
                 unit_handle.SetCanAttack(false);
                 unit_handle.SetCanCast(false);
                 unit_handle.SetCanMove(false);
             }
-
         }
 
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
+            if (owner == null)
+                return;
             //remove the negative buffs
             if (on_enemy)
             {

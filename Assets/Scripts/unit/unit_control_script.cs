@@ -650,14 +650,15 @@ public class unit_control_script : MonoBehaviour
             return;
         //go through all of the effects
         float fixed_damage = amount;
-        foreach(OnHit effect in on_hit_list)
+        fixed_damage = fixed_damage * 1 - ((0.06f * GetArmor()) / (1 + 0.06f * Mathf.Abs(GetArmor())));
+        foreach (OnHit effect in on_hit_list)
         {
             effect.OnHit(ref fixed_damage, attacker.gameObject);
         }
         //make the particle system activate
         bleed_system.Play();
-        hp -= fixed_damage * 1 - ((0.06f * GetArmor()) / (1 + 0.06f * Mathf.Abs(GetArmor())));
-        if (can_be_controlled && attack_target == null)
+        hp -= fixed_damage;
+        if (attack_target == null)
         {
             SetAttackOrder(attacker.gameObject);
         }
@@ -831,6 +832,11 @@ public class unit_control_script : MonoBehaviour
         if (damage_immune)
             return;
         hp -= amount;
+    }
+
+    public bool IsDead()
+    {
+        return is_dead;
     }
 
 

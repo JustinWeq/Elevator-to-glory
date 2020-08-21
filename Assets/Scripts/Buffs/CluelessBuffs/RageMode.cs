@@ -75,7 +75,8 @@ namespace Assets.Scripts.Buffs.CluelessBuffs
                     Ability ability = unit_handle.GetAbility(i);
                     if (ability is SleepTime_script)
                     {
-                        ability.ActivateAbility();
+                        if(ability.GetLevel() > 0)
+                            ability.ActivateAbility();
                         i = 4;
                     }
                 }

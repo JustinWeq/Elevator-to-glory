@@ -46,7 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Bonk!!!
   BaseCooldown:
-  - 12
+  - 1
   - 11
   - 10
   - 9
@@ -61,7 +61,7 @@ MonoBehaviour:
   - 100
   BaseCastTime: 0.2
   BaseCastRange:
-  - 400
+  - 11000
   - 400
   - 400
   - 400
@@ -78,14 +78,14 @@ MonoBehaviour:
   Thumbnail: {fileID: 2800000, guid: 6832b4d8a197d2d43bac5d885b766d74, type: 3}
   MaxLevel: 6
   StunDuration:
-  - 1.1
+  - 100
   - 1.2
   - 1.4
   - 1.6
   - 1.8
   - 2
   DamageAmount:
-  - 100
+  - 10
   - 150
   - 200
   - 250
@@ -104,7 +104,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: eef91488aaafc7f4a8942c642560620c, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.357
+  m_Volume: 0.066
   m_Pitch: 1
   Loop: 0
   Mute: 0
