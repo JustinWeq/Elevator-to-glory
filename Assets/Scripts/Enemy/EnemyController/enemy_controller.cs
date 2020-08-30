@@ -158,7 +158,7 @@ public class enemy_controller : MonoBehaviour
 
         //decide whether we can attack the player or noy
         //set attack target to something in range if we dont have one
-        if(can_attack && heading_target == null && target == null)
+        if(can_attack && heading_target == null && (target == null || target.IsDead()) )
         {
             //get the units in range and choose one randomly
             List<unit_control_script> units_in_range = GlobalManager.GetGlobalManager().GetLevelManager().GetPlayerUnitsInRange(GetPosition(), DetectionRange);
@@ -169,7 +169,7 @@ public class enemy_controller : MonoBehaviour
         }
 
         //Check to see if there are any units in attack range
-        if(can_attack && target == null)
+        if(can_attack && (target == null || target.IsDead()))
         {
             List<unit_control_script> units_in_range = GlobalManager.GetGlobalManager().GetLevelManager().GetPlayerUnitsInRange(GetPosition(), AttackRange);
             if (units_in_range.Count > 0)
@@ -205,7 +205,7 @@ public class enemy_controller : MonoBehaviour
         }
 
         //check to see if we can attack the player
-        if (can_attack && target != null && Vector3.Distance(target.transform.position, transform.position) < AttackRange / 100.0f)
+        if (can_attack && (target != null || !target.IsDead()) && Vector3.Distance(target.transform.position, transform.position) < AttackRange / 100.0f)
         {
             windup -= Time.deltaTime;
         }

@@ -23,7 +23,7 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6094279754877580384}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
+  m_Avatar: {fileID: 9000000, guid: f083af74a80f69947af5ee9ecaa3eb2e, type: 3}
   m_Controller: {fileID: 0}
   m_CullingMode: 0
   m_UpdateMode: 0
@@ -105,6 +105,8 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   AnimationTarget: {fileID: 0}
+  GraveStone: {fileID: 8232802131822950120, guid: feebb783cede96243a7e49db223fec82,
+    type: 3}
   BleedEffect: {fileID: 82980064600613687, guid: f14824f6e555598428594444564f9d91,
     type: 3}
 --- !u!1001 &2860584230035549545

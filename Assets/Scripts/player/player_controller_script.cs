@@ -191,7 +191,7 @@ public class player_controller_script : MonoBehaviour
 
     public void AddLives(int amount)
     {
-        lives = amount;
+        lives += amount;
     }
 
     public void SetPlayerId(int id)

@@ -23,14 +23,17 @@ public class ui_script : MonoBehaviour
     public Text SkillPointText;
     public Text LevelObjectiveText;
     public Text[] AbilityCooldownTexts = new Text[4];
+    public Text ExtraStatsText;
     public RawImage AbilityCardBack;
     public RawImage UIBack;
     public Text AbilityDescriptionText;
     public Text AbilityCostText;
+    public Text LivesText;
     public RawImage[] AbilityIcons = new RawImage[4];
     public RawImage[] AbilityIconTints = new RawImage[4];
     public RawImage[] ItemImages = new RawImage[6];
     public RawImage LevelIndicator;
+    public RawImage ExtraStatsBack;
     public Texture LeveledTexture;
     public Texture UnLeveledTexture;
     public UnityEngine.UI.Button LevelUpButton;
@@ -39,6 +42,9 @@ public class ui_script : MonoBehaviour
     public UnityEngine.UI.Button ResetButton;
     public UnityEngine.UI.Button ToggleSpawners;
     public UnityEngine.UI.Button RespawnButton;
+    public UnityEngine.UI.Button CanDieButton;
+    public UnityEngine.UI.Button ExtraStatsToggleBtn;
+    public UnityEngine.UI.Button AddLifeButton;
     private RawImage[][] level_indicators = new RawImage[4][];
     private float[] normal_tint_heights = new float[4];
     private float mana_bar_length;
@@ -73,7 +79,23 @@ public class ui_script : MonoBehaviour
         ResetButton.onClick.AddListener(ResetBtnClicked);
         RespawnButton.onClick.AddListener(RespawnBtnClicked);
         ToggleSpawners.onClick.AddListener(ToggleSpawnersBtnClicked);
+        CanDieButton.onClick.AddListener(CanDieButtonClicked);
+        AddLifeButton.onClick.AddListener(AddLifeBtnClicked);
+        ExtraStatsToggleBtn.onClick.AddListener(ExtraStatsToggleBtnClicked);
+        //toggle the extra stats
+        ToggleExtraStats();
+    }
+    
 
+    void ExtraStatsToggleBtnClicked()
+    {
+        ToggleExtraStats();
+    }
+
+    void AddLifeBtnClicked()
+    {
+        //add a life tpo the player controller
+        GlobalManager.GetGlobalManager().GetPlayerController().AddLives(1);
     }
 
     void GiveGoldBtnClicked()
@@ -84,17 +106,24 @@ public class ui_script : MonoBehaviour
 
     void RespawnBtnClicked()
     {
-
+        active_unit.Respawn();
     }
 
     void ResetBtnClicked()
     {
+        active_unit.ResetHpAndMana();
+        active_unit.ResetSkills();
+    }
 
+    void CanDieButtonClicked()
+    {
+        active_unit.SetCanDie(!active_unit.GetCanDie());
     }
 
     void ToggleSpawnersBtnClicked()
     {
-
+        //toggle the spawners in the leveel manager
+        GlobalManager.GetGlobalManager().GetLevelManager().ToggleSpawners();
     }
 
     public void SetActiveUnit(unit_control_script unit)
@@ -109,6 +138,12 @@ public class ui_script : MonoBehaviour
         AbilityDescriptionText.enabled = false;
         AbilityCostText.enabled = false;
         AbilityCardBack.enabled = false;
+    }
+
+    protected void ToggleExtraStats()
+    {
+        ExtraStatsText.enabled = !ExtraStatsText.enabled;
+        ExtraStatsBack.enabled = !ExtraStatsBack.enabled;
     }
 
     private void showAbilityCard(int index)
@@ -214,7 +249,8 @@ public class ui_script : MonoBehaviour
             {
                 AbilityIconTints[i].enabled = true;
                 AbilityIconTints[i].rectTransform.sizeDelta = new Vector2(AbilityIconTints[i].rectTransform.sizeDelta.x,
-                    normal_tint_heights[i] * (active_unit.GetAbility(i).GetRemainingCooldown() / active_unit.GetAbility(i).GetCooldown()));
+                    normal_tint_heights[i] * (active_unit.GetAbility(i).GetRemainingCooldown() / active_unit.GetAbility(i).GetCooldown() > 1?1:
+                    active_unit.GetAbility(i).GetRemainingCooldown() / active_unit.GetAbility(i).GetCooldown()));
                 AbilityCooldownTexts[i].enabled = true;
                 AbilityCooldownTexts[i].text = "" + active_unit.GetAbility(i).GetRemainingCooldown();
             }
@@ -270,11 +306,34 @@ public class ui_script : MonoBehaviour
         //set the level text
         LevelText.text = "Level: " + active_unit.GetLevel();
 
+        //set the lives text
+        LivesText.text = "X" + player_script.GetLives();
+
         //update the cooldowns
         UpdateCooldowns();
 
+        //update the extra stats text
+        str.Clear();
+        str.Append("Armor: " + active_unit.GetBaseArmor() + "+" + active_unit.GetAddedArmor());
+        str.Append("\nMagic resistance: " + active_unit.GetMagicResist());
+        str.Append("\nCastspeed reduction: " + active_unit.GetCastSpeedReduction());
+        str.Append("\nCooldown reduction: " + active_unit.GetCooldownReduction());
+        str.Append("\nCast range: " + active_unit.GetCastRange());
+        str.Append("\nSpell lifesteal: " + active_unit.GetSpellLifesteal());
+        str.Append("\nLifesteal: " + active_unit.GetLifesteal());
+        str.Append("\n Attack range: " + active_unit.GetAttackRange() );
+        str.Append("\n Pure damage: " + active_unit.GetPureDamage());
+        str.Append("\n Splash damage: " + active_unit.GetSplash());
+        str.Append("\n Cleave damage: " + active_unit.GetCleave());
+        str.Append("\n Crit damage: " + active_unit.GetCriticalDamage());
+        str.Append("\n Crit chance: " + active_unit.GetCriticalChance());
+        str.Append("\n Status resist: " + active_unit.GetStatusResist());
+
+        ExtraStatsText.text = str.ToString();
+
+
         //check to see if the player has clicked on a level
-        if(Input.GetMouseButtonDown(0) && leveling_mode)
+        if (Input.GetMouseButtonDown(0) && leveling_mode)
         {
             //check to see if the ability can be leveled
             for (int i = 0; i < AbilityIcons.Length; i++)

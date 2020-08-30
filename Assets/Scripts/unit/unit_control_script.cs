@@ -1,4 +1,6 @@
 ﻿using Assets.Scripts;
+using Assets.Scripts.unit;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -38,6 +40,7 @@ public class unit_control_script : MonoBehaviour
     public bool CustomUi = false;
     public GameObject[] Abilities = new GameObject[6];
     public GameObject AnimationTarget;
+    public GameObject GraveStone;
     public ParticleSystem BleedEffect;
     private ParticleSystem bleed_system;
     protected Ability[] abilitys = new Ability[6];
@@ -147,23 +150,23 @@ public class unit_control_script : MonoBehaviour
         attack_speed = agility;
         //set starting damage
         damage = BaseDamage;
-        switch(PrimaryAttribute)
+        switch (PrimaryAttribute)
         {
             case PrimaryAttributeType.Agility:
-            {
-                damage += agility;
-                break;
-            }
+                {
+                    damage += agility;
+                    break;
+                }
             case PrimaryAttributeType.Strength:
-            {
+                {
                     damage += strength;
-               break;
-            }
+                    break;
+                }
             case PrimaryAttributeType.Intelligence:
-            {
+                {
                     damage += intelligence;
-               break;
-            }
+                    break;
+                }
         }
 
         //set spell amp
@@ -173,12 +176,12 @@ public class unit_control_script : MonoBehaviour
         magic_resistance = BASE_MAGIC_RESIST;
 
         //set base movespeed
-        movespeed = BaseMoveSpeed + MovespeedScaler*agility;
+        movespeed = BaseMoveSpeed + MovespeedScaler * agility;
 
         //read in the abilitys
-        for(int i = 0;i < 6;i++)
+        for (int i = 0; i < 6; i++)
         {
-            if(Abilities[i] != null)
+            if (Abilities[i] != null)
             {
 
                 abilitys[i] = Instantiate(Abilities[i].GetComponent<Ability>());
@@ -251,7 +254,7 @@ public class unit_control_script : MonoBehaviour
     {
         //level up for each amount of xp over the amount needed to level
         experience += amount;
-        for (int i = 0; i < experience/XP_NEEDED_FOR_LEVEL; i++)
+        for (int i = 0; i < experience / XP_NEEDED_FOR_LEVEL; i++)
         {
             LevelUp();
         }
@@ -265,7 +268,7 @@ public class unit_control_script : MonoBehaviour
         ability_points++;
 
         //update hp
-        hp += HP_SCALER *BaseStrengthGain;
+        hp += HP_SCALER * BaseStrengthGain;
         max_hp += HP_SCALER * BaseStrengthGain;
         hp_regen += HP_REGEN_SCALER * BaseStrengthGain;
 
@@ -315,9 +318,9 @@ public class unit_control_script : MonoBehaviour
 
     public bool LevelAbility(int index)
     {
-        if(ability_points > 0)
+        if (ability_points > 0)
         {
-            if(abilitys[index] != null && abilitys[index].Level())
+            if (abilitys[index] != null && abilitys[index].Level())
             {
                 ability_points--;
                 return true;
@@ -331,10 +334,152 @@ public class unit_control_script : MonoBehaviour
         return abilitys[index];
     }
 
-    public bool ActivateAbility(int index,GameObject target)
+    public bool ActivateAbility(int index, GameObject target)
     {
         return abilitys[index].ActivateAbility(target);
     }
+
+    public void AddAgility(float amount)
+    {
+        agility += amount;
+        armor += ARMOR_SCALER * amount;
+        attack_speed += amount;
+        movespeed += amount * MovespeedScaler;
+        if (PrimaryAttribute == PrimaryAttributeType.Agility)
+        {
+            damage += amount;
+        }
+
+    }
+
+    public void AddStrength(float amount)
+    {
+        strength += amount;
+        hp_regen += HP_REGEN_SCALER * amount;
+        max_hp += HP_SCALER * amount;
+        if (PrimaryAttribute == PrimaryAttributeType.Strength)
+        {
+            damage += amount;
+        }
+    }
+
+    public void AddInt(float amount)
+    {
+        intelligence += amount;
+        mana_regen += MANA_REGEN_SCALER * amount;
+        mana += MANA_SCALER * amount;
+        if (PrimaryAttribute == PrimaryAttributeType.Intelligence)
+        {
+            damage += amount;
+        }
+    }
+
+    public void AddDamage(float amount)
+    {
+        added_damage += amount;
+    }
+
+    public void AddArmor(float amount)
+    {
+        added_armor += amount;
+    }
+
+    public void AddAttackRange(float amount)
+    {
+        attack_range += amount;
+    }
+
+    public void AddAttackSpeed(float amount)
+    {
+        added_attack_speed += amount;
+    }
+
+    public void AddCastRange(float amount)
+    {
+        cast_range += amount;
+    }
+
+    public void AddCleave(float amount)
+    {
+        cleave += amount;
+    }
+
+    public void AddSplash(float amount)
+    {
+        splash += amount;
+    }
+
+    public void AddStatusResist(float amount)
+    {
+        status_resist += amount;
+    }
+
+    public void AddCooldownReduction(float amount)
+    {
+        cooldown_reduction += amount;
+    }
+
+    public void AddCritChance(float amount)
+    {
+        critical_chance += amount;
+    }
+
+    public void AddCritDamage(float amount)
+    {
+        critical_damage += amount;
+    }
+
+    public void AddMaxHp(float amount)
+    {
+        max_hp += amount;
+        hp += amount;
+    }
+
+    public void AddHpRegen(float amount)
+    {
+        hp_regen += amount;
+    }
+
+    public void AddMagicResistance(float amount)
+    {
+        magic_resistance += amount;
+    }
+
+    public void AddMaxMana(float amount)
+    {
+        max_mana += amount;
+    }
+
+    public void AddManaRegen(float amount)
+    {
+        mana_regen += amount;
+    }
+
+    public void AddPureDamage(float amount)
+    {
+        pure_damage += amount;
+    }
+
+    public void AddSpellAmp(float amount)
+    {
+        spell_amp += amount;
+    }
+
+    public void AddLifeSteal(float amount)
+    {
+        lifesteal += amount;
+    }
+
+    public void AddSpellLifeSteal(float amount)
+    {
+        spell_lifesteal += amount;
+    }
+
+    public void AddCastSpeedReduction(float amount)
+    {
+        castspeed_reduction += amount;
+    }
+
     public float GetMaxMana()
     {
         return max_mana;
@@ -389,7 +534,7 @@ public class unit_control_script : MonoBehaviour
         this.can_die = can_die;
     }
 
-    public bool GetCanDie(bool can_die)
+    public bool GetCanDie()
     {
         return can_die;
     }
@@ -583,8 +728,27 @@ public class unit_control_script : MonoBehaviour
         return ability_points;
     }
 
+    public void ResetSkills()
+    {
+        foreach(Ability ability in abilitys)
+        {
+            if(ability != null)
+               ability.ResetCooldown();
+        }
+    }
 
+    public void ResetHpAndMana()
+    {
+        hp = max_hp;
+        mana = max_mana;
+    }
 
+    public void Respawn()
+    {
+        ResetHpAndMana();
+        is_dead = false;
+        GetComponent<MeshRenderer>().enabled = true;
+    }
 
 
 
@@ -602,6 +766,10 @@ public class unit_control_script : MonoBehaviour
             {
                 hp = 0;
                 is_dead = true;
+                Assets.Scripts.unit.GraveStone grave = Instantiate(GraveStone).GetComponent<Assets.Scripts.unit.GraveStone>();
+                grave.SetOwner(this);
+                //disable renderer
+                GetComponent<MeshRenderer>().enabled = false;
             }
             else
             {
@@ -623,7 +791,7 @@ public class unit_control_script : MonoBehaviour
 
 
         //check to see if we can attack the enemy
-        if(attack_target != null && Vector3.Distance(attack_target.transform.position,transform.position) < GetAttackRange()/100.0f)
+        if(  attack_target != null && !attack_target.IsDead() && Vector3.Distance(attack_target.transform.position,transform.position) < GetAttackRange()/100.0f)
         {
             windup -= Time.deltaTime;
             transform.rotation = Quaternion.LookRotation(new Vector3(attack_target.GetPosition().x, attack_target.GetPosition().z));
@@ -658,7 +826,7 @@ public class unit_control_script : MonoBehaviour
         //make the particle system activate
         bleed_system.Play();
         hp -= fixed_damage;
-        if (attack_target == null)
+        if (attack_target == null || attack_target.IsDead())
         {
             SetAttackOrder(attacker.gameObject);
         }
@@ -689,7 +857,7 @@ public class unit_control_script : MonoBehaviour
         //calculate crit
         int crit_multiply = 0;
         crit_multiply +=(int) (critical_chance / 100);
-        crit_multiply += Random.Range(1, 100) < (int)(critical_chance) % 100?1:0;
+        crit_multiply += UnityEngine.Random.Range(1, 100) < (int)(critical_chance) % 100?1:0;
         //add crit damage
         total_damage += total_damage * crit_multiply * critical_damage;
         total_damage += pure_damage;

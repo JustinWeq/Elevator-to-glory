@@ -167,6 +167,11 @@ public abstract class Ability : MonoBehaviour
         return remaining_cooldown;
     }
 
+    public void ResetCooldown()
+    {
+        remaining_cooldown = 0;
+    }
+
     public float GetCastRange()
     {
         return cast_range;

@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.utility;
+﻿using Assets.Scripts.Spawners;
+using Assets.Scripts.utility;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,8 @@ public abstract class level_manager : MonoBehaviour
     public string LevelObjective;
     protected List<enemy_controller> enemys;
     protected List<unit_control_script> player_units;
+    protected List<BasicSpawner> spawners;
+    protected bool spawners_enabled = true;
     // Start is called before the first frame update
     void Awake()
     {
@@ -15,7 +18,11 @@ public abstract class level_manager : MonoBehaviour
         enemys = new List<enemy_controller>();
         //init the player list
         player_units = new List<unit_control_script>();
+        //init the spawner list
+        spawners = new List<BasicSpawner>();
         GlobalManager.GetGlobalManager().SetLevelManager(this);
+
+
     }
 
     // Update is called once per frame
@@ -47,6 +54,47 @@ public abstract class level_manager : MonoBehaviour
     public void RemovePlayerUnit(unit_control_script unit)
     {
         player_units.Remove(unit);
+    }
+
+    public void AddSpawner(BasicSpawner spawner)
+    {
+        this.spawners.Add(spawner);
+    }
+
+    public void RemoveSpawner(BasicSpawner spawner)
+    {
+        spawners.Remove(spawner);
+    }
+
+    public void EnableSpawners()
+    {
+        foreach(BasicSpawner spawner in spawners)
+        {
+            spawner.SetCanSpawn(true);
+        }
+        spawners_enabled = true;
+    }
+
+    public bool SpawnersEnabled()
+    {
+        return spawners_enabled;
+    }
+
+    public void ToggleSpawners()
+    {
+        if (spawners_enabled)
+            DisableSpawners();
+        else
+            EnableSpawners();
+    }
+
+    public void DisableSpawners()
+    {
+        foreach(BasicSpawner spawner in spawners)
+        {
+            spawner.SetCanSpawn(false);
+        }
+        spawners_enabled = false;
     }
 
     public static level_manager GetLevelManager()
